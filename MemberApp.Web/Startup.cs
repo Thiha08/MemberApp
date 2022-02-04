@@ -1,5 +1,8 @@
 using MemberApp.Data;
 using MemberApp.Data.Abstract;
+using MemberApp.Data.Infrastructure;
+using MemberApp.Data.Infrastructure.Services;
+using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Security.Claims;
 
 namespace MemberApp.Web
 {
@@ -29,6 +33,25 @@ namespace MemberApp.Web
 
             // Repositories
             services.AddScoped<IMemberRepository, MemberRepository>();
+            services.AddScoped<IMemberRoleRepository, MemberRoleRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<ILoggingRepository, LoggingRepository>();
+
+            // Services
+            services.AddScoped<IMembershipService, MembershipService>();
+            services.AddScoped<IEncryptionService, EncryptionService>();
+
+            services.AddAuthentication();
+
+            // Polices
+            services.AddAuthorization(options =>
+            {
+                // inline policies
+                options.AddPolicy("AdminOnly", policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, "Admin");
+                });
+            });
 
             services.AddControllersWithViews();
         }
@@ -56,6 +79,8 @@ namespace MemberApp.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            DbInitializer.Initialize(app.ApplicationServices);
         }
     }
 }

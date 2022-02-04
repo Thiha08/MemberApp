@@ -1,6 +1,6 @@
 ﻿using MemberApp.Data.Abstract;
+using MemberApp.Data.Infrastructure.Core;
 using MemberApp.Model.Entities;
-using MemberApp.Web.Core;
 using MemberApp.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,44 +12,57 @@ namespace MemberApp.Web.ApiControllers
     [Route("api/[controller]")]
     public class MembersController : ControllerBase
     {
-        private IMemberRepository _memberRepository;
+        private readonly IMemberRepository _memberRepository;
+        private readonly ILoggingRepository _loggingRepository;
 
         int page = 1;
         int pageSize = 4;
 
-        public MembersController(IMemberRepository memberRepository)
+        public MembersController(IMemberRepository memberRepository, ILoggingRepository loggingRepository)
         {
             _memberRepository = memberRepository;
+            _loggingRepository = loggingRepository;
         }
 
-        public IActionResult Get()
+        [HttpGet("{page:int=0}/{pageSize=12}")]
+        public PaginationSet<MemberViewModel> Get(int? page, int? pageSize)
         {
-            var pagination = Request.Headers["Pagination"];
+            PaginationSet<MemberViewModel> pagedSet = null;
 
-            if (!string.IsNullOrEmpty(pagination))
+            try
             {
-                string[] vals = pagination.ToString().Split(',');
-                int.TryParse(vals[0], out page);
-                int.TryParse(vals[1], out pageSize);
+                int currentPage = page.Value;
+                int currentPageSize = pageSize.Value;
+
+                List<Member> _members = null;
+                int _totalMembers = new int();
+
+                _members = _memberRepository
+                    .GetAll()
+                    .OrderBy(p => p.Id)
+                    .Skip(currentPage * currentPageSize)
+                    .Take(currentPageSize)
+                    .ToList();
+
+                _totalMembers = _memberRepository.Count();
+
+                IEnumerable<MemberViewModel> _membersVM = new List<MemberViewModel>();
+
+                pagedSet = new PaginationSet<MemberViewModel>()
+                {
+                    Page = currentPage,
+                    TotalCount = _totalMembers,
+                    TotalPages = (int)Math.Ceiling((decimal)_totalMembers / currentPageSize),
+                    Items = _membersVM
+                };
+            }
+            catch (Exception ex)
+            {
+                _loggingRepository.Add(new Error() { Message = ex.Message, StackTrace = ex.StackTrace, DateCreated = DateTime.Now });
+                _loggingRepository.Commit();
             }
 
-            int currentPage = page;
-            int currentPageSize = pageSize;
-            var totalMembers = _memberRepository.Count();
-            var totalPages = (int)Math.Ceiling((double)totalMembers / pageSize);
-
-            IEnumerable<Member> _schedules = _memberRepository
-                .GetAll()
-                .OrderBy(s => s.Id)
-                .Skip((currentPage - 1) * currentPageSize)
-                .Take(currentPageSize)
-                .ToList();
-
-            Response.AddPagination(page, pageSize, totalMembers, totalPages);
-
-            IEnumerable<MemberViewModel> _membersVM = new List<MemberViewModel>();
-
-            return new OkObjectResult(_membersVM);
+            return pagedSet;
         }
 
         [HttpGet("{id}", Name = "GetMember")]

@@ -1,6 +1,7 @@
 ﻿using MemberApp.Web.ViewModels.Validations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MemberApp.Web.ViewModels
 {
