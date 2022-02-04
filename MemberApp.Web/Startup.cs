@@ -4,14 +4,21 @@ using MemberApp.Data.Infrastructure;
 using MemberApp.Data.Infrastructure.Services;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Data.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Security.Claims;
+using System.Text;
 
 namespace MemberApp.Web
 {
@@ -33,24 +40,56 @@ namespace MemberApp.Web
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder => builder.MigrationsAssembly("MemberApp.Web")));
 
             // Repositories
-            services.AddScoped<IMemberRepository, MemberRepository>();
-            services.AddScoped<IMemberRoleRepository, MemberRoleRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
-            services.AddScoped<ILoggingRepository, LoggingRepository>();
+            services.AddTransient<IMemberRepository, MemberRepository>();
+            services.AddTransient<IMemberRoleRepository, MemberRoleRepository>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
+            services.AddTransient<ILoggingRepository, LoggingRepository>();
 
             // Services
-            services.AddScoped<IMembershipService, MembershipService>();
-            services.AddScoped<IEncryptionService, EncryptionService>();
+            services.AddTransient<IMembershipService, MembershipService>();
+            services.AddTransient<IEncryptionService, EncryptionService>();
+            services.AddTransient<ITokenService, TokenService>();
 
-            services.AddAuthentication();
+
+            // Configure Authentication with JWT and Cookies
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+            })
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // optional
+            });
+
+            // Defining the multi-scheme policy
+            var multiSchemePolicy = new AuthorizationPolicyBuilder(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
 
             // Polices
             services.AddAuthorization(options =>
             {
+                options.DefaultPolicy = multiSchemePolicy;
                 // inline policies
-                options.AddPolicy("AdminOnly", policy =>
+                options.AddPolicy("AdminOnly", builder =>
                 {
-                    policy.RequireClaim(ClaimTypes.Role, "Admin");
+                    builder.RequireClaim(ClaimTypes.Role, "Admin");
                 });
             });
 
@@ -76,9 +115,24 @@ namespace MemberApp.Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseSession();
+
+            app.Use(async (context, next) =>
+            {
+                var token = context.Session.GetString("Token");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + token);
+                }
+                await next();
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

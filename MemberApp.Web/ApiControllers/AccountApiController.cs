@@ -5,8 +5,10 @@ using MemberApp.Model.Entities;
 using MemberApp.Web.ViewModels;
 using MemberApp.Web.ViewModels.Params;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -18,16 +20,23 @@ namespace MemberApp.Web.ApiControllers
     [Consumes("application/json")]
     public class AccountApiController : ControllerBase
     {
+        private readonly IConfiguration _config;
         private readonly IMembershipService _membershipService;
+        private readonly ITokenService _tokenService;
         private readonly IMemberRepository _memberRepository;
         private readonly ILoggingRepository _loggingRepository;
+        private string _generatedToken = null;
 
         public AccountApiController(
+            IConfiguration config,
             IMembershipService membershipService,
+            ITokenService tokenService,
             IMemberRepository memberRepository,
             ILoggingRepository loggingRepository)
         {
+            _config = config;
             _membershipService = membershipService;
+            _tokenService = tokenService;
             _memberRepository = memberRepository;
             _loggingRepository = loggingRepository;
         }
@@ -44,17 +53,15 @@ namespace MemberApp.Web.ApiControllers
 
                 if (_memberContext.Member != null)
                 {
-                    IEnumerable<Role> _roles = _memberRepository.GetMemberRoles(loginParams.Username);
-                    List<Claim> _claims = new List<Claim>();
-                    foreach (Role role in _roles)
-                    {
-                        Claim _claim = new Claim(ClaimTypes.Role, role.Name, ClaimValueTypes.String, loginParams.Username);
-                        _claims.Add(_claim);
-                    }
+                    var _roles = _memberRepository.GetMemberRoles(loginParams.Username)
+                        .Select(x => x.Name)
+                        .ToArray();
 
-                    //await HttpContext.Authentication.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    //    new ClaimsPrincipal(new ClaimsIdentity(_claims, CookieAuthenticationDefaults.AuthenticationScheme)),
-                    //    new Microsoft.AspNetCore.Http.Authentication.AuthenticationProperties { IsPersistent = user.RememberMe });
+                    _generatedToken = _tokenService.BuildToken(
+                        _config["Jwt:Key"].ToString(), 
+                        _config["Jwt:Issuer"].ToString(),
+                        _memberContext.Member.Username,
+                        _roles);
 
                     _authenticationResult = new GenericResult()
                     {
