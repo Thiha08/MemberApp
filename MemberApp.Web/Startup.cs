@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 
 namespace MemberApp.Web
@@ -53,6 +54,14 @@ namespace MemberApp.Web
                 });
             });
 
+            // Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MS API", Version = "v1" });
+            });
+
+            services.AddSwaggerGenNewtonsoftSupport();
+
             services.AddControllersWithViews();
         }
 
@@ -73,12 +82,23 @@ namespace MemberApp.Web
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                c.RoutePrefix = "swagger";
+                c.SwaggerEndpoint("v1/swagger.json", "MS API V1");
             });
+
+
+            app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                });
 
             DbInitializer.Initialize(app);
         }

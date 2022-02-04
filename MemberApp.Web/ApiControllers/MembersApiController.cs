@@ -2,21 +2,23 @@
 using MemberApp.Data.Infrastructure.Core;
 using MemberApp.Model.Entities;
 using MemberApp.Web.ViewModels;
+using MemberApp.Web.ViewModels.Params;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MemberApp.Web.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
+    [Route("api/members")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class MembersApiController : ControllerBase
     {
         private readonly IMemberRepository _memberRepository;
         private readonly ILoggingRepository _loggingRepository;
-
-        int page = 1;
-        int pageSize = 4;
 
         public MembersApiController(IMemberRepository memberRepository, ILoggingRepository loggingRepository)
         {
@@ -24,24 +26,21 @@ namespace MemberApp.Web.ApiControllers
             _loggingRepository = loggingRepository;
         }
 
-        [HttpGet("{page:int=0}/{pageSize=12}")]
-        public PaginationSet<MemberViewModel> Get(int? page, int? pageSize)
+        [HttpGet]
+        public PaginationSet<MemberViewModel> Get([FromQuery, BindRequired] string keywords, [FromQuery] PagingParams pagingParams)
         {
             PaginationSet<MemberViewModel> pagedSet = null;
 
             try
             {
-                int currentPage = page.Value;
-                int currentPageSize = pageSize.Value;
-
                 List<Member> _members = null;
                 int _totalMembers = new int();
 
                 _members = _memberRepository
                     .GetAll()
                     .OrderBy(p => p.Id)
-                    .Skip(currentPage * currentPageSize)
-                    .Take(currentPageSize)
+                    .Skip((pagingParams.PageNo - 1) * pagingParams.PageSize)
+                    .Take(pagingParams.PageSize)
                     .ToList();
 
                 _totalMembers = _memberRepository.Count();
@@ -50,9 +49,9 @@ namespace MemberApp.Web.ApiControllers
 
                 pagedSet = new PaginationSet<MemberViewModel>()
                 {
-                    Page = currentPage,
+                    Page = pagingParams.PageNo,
                     TotalCount = _totalMembers,
-                    TotalPages = (int)Math.Ceiling((decimal)_totalMembers / currentPageSize),
+                    TotalPages = (int)Math.Ceiling((decimal)_totalMembers / pagingParams.PageSize),
                     Items = _membersVM
                 };
             }
@@ -65,7 +64,7 @@ namespace MemberApp.Web.ApiControllers
             return pagedSet;
         }
 
-        [HttpGet("{id}", Name = "GetMember")]
+        [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
             Member _member = _memberRepository.GetSingle(s => s.Id == id);
@@ -81,7 +80,7 @@ namespace MemberApp.Web.ApiControllers
             }
         }
 
-        [HttpGet("{id}/details", Name = "GetMemberDetails")]
+        [HttpGet("{id}/details")]
         public IActionResult GetMemberDetails(int id)
         {
             Member _member = _memberRepository.GetSingle(s => s.Id == id);

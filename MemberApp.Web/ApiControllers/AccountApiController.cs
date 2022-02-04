@@ -3,6 +3,7 @@ using MemberApp.Data.Infrastructure.Core;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Entities;
 using MemberApp.Web.ViewModels;
+using MemberApp.Web.ViewModels.Params;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,10 @@ using System.Threading.Tasks;
 
 namespace MemberApp.Web.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
+    [Route("api/account")]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     public class AccountApiController : ControllerBase
     {
         private readonly IMembershipService _membershipService;
@@ -29,22 +33,22 @@ namespace MemberApp.Web.ApiControllers
         }
 
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel user)
+        public async Task<IActionResult> Login([FromBody] LoginParams loginParams)
         {
             IActionResult _result = new ObjectResult(false);
             GenericResult _authenticationResult = null;
 
             try
             {
-                MembershipContext _memberContext = _membershipService.ValidateMember(user.Username, user.Password);
+                MembershipContext _memberContext = _membershipService.ValidateMember(loginParams.Username, loginParams.Password);
 
                 if (_memberContext.Member != null)
                 {
-                    IEnumerable<Role> _roles = _memberRepository.GetMemberRoles(user.Username);
+                    IEnumerable<Role> _roles = _memberRepository.GetMemberRoles(loginParams.Username);
                     List<Claim> _claims = new List<Claim>();
                     foreach (Role role in _roles)
                     {
-                        Claim _claim = new Claim(ClaimTypes.Role, role.Name, ClaimValueTypes.String, user.Username);
+                        Claim _claim = new Claim(ClaimTypes.Role, role.Name, ClaimValueTypes.String, loginParams.Username);
                         _claims.Add(_claim);
                     }
 
@@ -101,8 +105,7 @@ namespace MemberApp.Web.ApiControllers
 
         }
 
-        [Route("register")]
-        [HttpPost]
+        [HttpPost("register")]
         public IActionResult Register([FromBody] RegistrationViewModel user)
         {
             IActionResult _result = new ObjectResult(false);
