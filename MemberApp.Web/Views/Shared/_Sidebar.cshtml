@@ -1,0 +1,41 @@
+﻿@{
+    string controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+
+    string actionName = this.ViewContext.RouteData.Values["action"].ToString();
+}
+
+<!-- Sidebar -->
+
+<div class="sidebar" data-color="green" data-background-color="white" @*data-image="~/lib/material-dashboard/assets/img/sidebar-1.jpg"*@>
+    <!--
+        Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+
+        Tip 2: you can also add an image using data-image tag
+    -->
+    <div class="logo">
+        <a href="#" class="simple-text logo-normal">
+            MS
+        </a>
+    </div>
+    <div class="sidebar-wrapper">
+
+        <ul class="nav">
+
+            <li class="nav-item @(controllerName == "Home" ? "active" : "")">
+                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                    <i class="material-icons">dashboard</i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
+
+            <li class="nav-item @(controllerName == "Member" ? "active" : "")">
+                <a class="nav-link" asp-controller="Member" asp-action="Index">
+                    <i class="material-icons">connect_without_contact</i>
+                    <p>Member Management</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- ./ End Sidebar -->

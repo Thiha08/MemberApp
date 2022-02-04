@@ -10,7 +10,7 @@ using System.Linq;
 namespace MemberApp.Web.ApiControllers
 {
     [Route("api/[controller]")]
-    public class MembersController : ControllerBase
+    public class MembersApiController : ControllerBase
     {
         private readonly IMemberRepository _memberRepository;
         private readonly ILoggingRepository _loggingRepository;
@@ -18,7 +18,7 @@ namespace MemberApp.Web.ApiControllers
         int page = 1;
         int pageSize = 4;
 
-        public MembersController(IMemberRepository memberRepository, ILoggingRepository loggingRepository)
+        public MembersApiController(IMemberRepository memberRepository, ILoggingRepository loggingRepository)
         {
             _memberRepository = memberRepository;
             _loggingRepository = loggingRepository;

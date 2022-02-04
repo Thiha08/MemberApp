@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 namespace MemberApp.Web.ApiControllers
 {
     [Route("api/[controller]")]
-    public class AccountController : ControllerBase
+    public class AccountApiController : ControllerBase
     {
         private readonly IMembershipService _membershipService;
         private readonly IMemberRepository _memberRepository;
         private readonly ILoggingRepository _loggingRepository;
 
-        public AccountController(
+        public AccountApiController(
             IMembershipService membershipService,
             IMemberRepository memberRepository,
             ILoggingRepository loggingRepository)

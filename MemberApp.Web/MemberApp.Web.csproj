@@ -20,8 +20,4 @@
     <ProjectReference Include="..\MemberApp.Data\MemberApp.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\images\" />
-  </ItemGroup>
-
 </Project>

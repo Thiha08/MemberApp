@@ -80,7 +80,7 @@ namespace MemberApp.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            DbInitializer.Initialize(app.ApplicationServices);
+            DbInitializer.Initialize(app);
         }
     }
 }
