@@ -1,4 +1,6 @@
 ﻿using MemberApp.Model.Entities;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
@@ -8,11 +10,16 @@ namespace MemberApp.Data.Infrastructure
     {
         private static MemberAppContext context;
 
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static void Initialize(IApplicationBuilder app)
         {
-            context = (MemberAppContext)serviceProvider.GetService(typeof(MemberAppContext));
+            using (var serviceScope = app.ApplicationServices.CreateScope())
+            {
+                context = serviceScope.ServiceProvider.GetService<MemberAppContext>();
 
-            InitializeMemberRoles();
+                InitializeMemberRoles();
+
+                // Seed the database.
+            }
         }
 
         private static void InitializeMemberRoles()
@@ -43,6 +50,8 @@ namespace MemberApp.Data.Infrastructure
                     IsLocked = false,
                     DateCreated = DateTime.Now
                 });
+
+                context.SaveChanges();
 
                 // create user-admin
                 context.MemberRoles.AddRange(new MemberRole[] 
