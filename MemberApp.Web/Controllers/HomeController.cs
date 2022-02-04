@@ -1,11 +1,7 @@
-﻿using MemberApp.Web.Models;
+﻿using MemberApp.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MemberApp.Web.Controllers
 {
