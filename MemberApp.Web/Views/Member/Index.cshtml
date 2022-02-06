@@ -1,0 +1,160 @@
+﻿@model IEnumerable<MemberOverviewViewModel>
+
+@{
+    ViewData["Title"] = "Members";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-success card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">people</i>
+                    </div>
+                    <h4 class="card-title">Members</h4>
+                </div>
+                <div class="card-body">
+                    <div class="toolbar text-right">
+                        <a class="btn btn-info btn-create" asp-controller="Member" asp-action="Create">
+                            New
+                            <i class="material-icons">keyboard_arrow_right</i>
+                        </a>
+                    </div>
+                    <div class="material-datatables">
+                        <div id="datatables_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="datatables" class="crop-production-table table table-striped table-no-bordered table-hover dataTable dtr-inline" cellspacing="0" width="100%" style="width: 100%;" role="grid" aria-describedby="datatables_info">
+                                        <thead>
+                                            <tr role="row">
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.FullName)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CadetNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CadetBattalion)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Email)
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.Any())
+                                            {
+                                                foreach (var item in Model)
+                                                {
+                                                    <tr role="row" data-cropproductionid="@item.Id" style="">
+                                                        <td tabindex="0" class="sorting_1">
+                                                            @Html.DisplayFor(modelItem => item.FullName)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.CadetNumber)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.CadetBattalion)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Email)
+                                                        </td>
+                                                        <td class="td-actions text-right">
+                                                            <a asp-controller="CropProduction" asp-action="Manage" asp-route-id="@item.Id"
+                                                       class="btn btn-link btn-success btn-just-icon edit">
+                                                                <i class="material-icons">biotech</i>
+                                                            </a>
+                                                            <a asp-controller="CropProduction" asp-action="Edit" asp-route-id="@item.Id"
+                                                       class="btn btn-link btn-warning btn-just-icon edit">
+                                                                <i class="material-icons">edit</i>
+                                                            </a>
+                                                            <a id="delete-button" item-id="@item.Id"
+                                                       class="btn btn-link btn-danger btn-just-icon remove"
+                                                       data-toggle="modal"
+                                                       data-target="#confirmationDeleteModal">
+                                                                <i class="material-icons">close</i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr role="row">
+                                                    <td colspan="7" class="text-center">
+                                                        No data found.
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end content-->
+            </div>
+            <!--  end card  -->
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmationDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmationDeleteModalLabel" aria-hidden="true">
+
+    <form asp-controller="CropProduction" asp-action="Delete" method="post">
+
+        <input type="hidden" name="Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to delete it?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts
+{
+<script>
+
+    $(function () {
+
+        $('#delete-button').on('click', function () {
+            $('#confirmationDeleteModal input[name="Id"]').val($(this).attr('item-id'));
+        });
+
+        //$('.crop-production-table tbody tr td').not(":last-child").click(function () {
+        //    //This will only be triggered on the td that are not the last on a tr
+
+        //    var cropProductionId = $(this).parents('tr').data('cropproductionid');
+
+        //    var url = location.href.substr(0, (location.href.lastIndexOf('/') + 1));
+        //    url = url + "CropProduction/ManageCropProducation?cropProductionId=" + cropProductionId;
+        //    window.open(url, '_blank');
+
+        //});
+    });
+
+</script>
+}

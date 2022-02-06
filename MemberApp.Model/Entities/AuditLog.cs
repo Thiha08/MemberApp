@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MemberApp.Model.Entities
 {
-    public class Error : IEntityBase
+    public class AuditLog : EntityBase, IAggregateRoot
     {
-        public int Id { get; set; }
+        public LogLevel LogLevel { get; set; }
         public string Message { get; set; }
         public string StackTrace { get; set; }
-        public DateTime DateCreated { get; set; }
     }
 }

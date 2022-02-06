@@ -3,13 +3,13 @@ using MemberApp.Data.Abstract;
 using MemberApp.Data.Infrastructure;
 using MemberApp.Data.Infrastructure.Services;
 using MemberApp.Data.Infrastructure.Services.Abstract;
-using MemberApp.Data.Repositories;
+using MemberApp.Model.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,62 +34,92 @@ namespace MemberApp.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
+
+            services.AddHttpContextAccessor();
+
             string connectionString = Configuration.GetConnectionString("MemberAppDatabase");
 
-            services.AddDbContextPool<MemberAppContext>(options =>
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder => builder.MigrationsAssembly("MemberApp.Web")));
+            services.AddDbContext<MemberAppContext>(options =>
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+                builder => builder.MigrationsAssembly("MemberApp.Web")));
 
-            // Repositories
-            services.AddTransient<IMemberRepository, MemberRepository>();
-            services.AddTransient<IMemberRoleRepository, MemberRoleRepository>();
-            services.AddTransient<IRoleRepository, RoleRepository>();
-            services.AddTransient<ILoggingRepository, LoggingRepository>();
+            services.AddDefaultIdentity<ApplicationUser>()
+                    .AddRoles<IdentityRole>()
+                    .AddEntityFrameworkStores<MemberAppContext>();
 
-            // Services
-            services.AddTransient<IMembershipService, MembershipService>();
-            services.AddTransient<IEncryptionService, EncryptionService>();
-            services.AddTransient<ITokenService, TokenService>();
-
-
-            // Configure Authentication with JWT and Cookies
-            services.AddAuthentication(options =>
+            services.Configure<IdentityOptions>(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                };
-            })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // optional
+                // Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+
+                // Lockout settings.
+                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                //options.Lockout.MaxFailedAccessAttempts = 5;
+                //options.Lockout.AllowedForNewUsers = true;
+
+                // User settings.
+                //options.User.AllowedUserNameCharacters =
+                //"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
             });
 
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    // Cookie settings
+            //    options.Cookie.HttpOnly = true;
+            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+
+            //    options.LoginPath = "/Account/Login";
+            //    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            //    options.SlidingExpiration = true;
+            //});
+
+            // Configure Authentication with JWT and Cookies
+            services.AddAuthentication()
+                .AddCookie(options =>
+                {
+                    // Cookie settings
+                    options.Cookie.HttpOnly = true;
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // optional
+
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                    options.SlidingExpiration = true;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
+
+
             // Defining the multi-scheme policy
-            var multiSchemePolicy = new AuthorizationPolicyBuilder(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser()
-                .Build();
+            //var multiSchemePolicy = new AuthorizationPolicyBuilder(
+            //    CookieAuthenticationDefaults.AuthenticationScheme,
+            //    JwtBearerDefaults.AuthenticationScheme)
+            //    .RequireAuthenticatedUser()
+            //    .Build();
 
             // Polices
             services.AddAuthorization(options =>
             {
-                options.DefaultPolicy = multiSchemePolicy;
+                options.DefaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 // inline policies
                 options.AddPolicy("AdminOnly", builder =>
                 {
-                    builder.RequireClaim(ClaimTypes.Role, "Admin");
+                    builder.RequireRole("Admin");
                 });
             });
 
@@ -100,6 +130,14 @@ namespace MemberApp.Web
             });
 
             services.AddSwaggerGenNewtonsoftSupport();
+
+            // Repositories
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            // Services
+            //services.AddTransient<IMembershipService, MembershipService>();
+            services.AddTransient<IEncryptionService, EncryptionService>();
+            services.AddTransient<ITokenService, TokenService>();
 
             services.AddControllersWithViews();
         }
@@ -118,15 +156,15 @@ namespace MemberApp.Web
 
             app.UseSession();
 
-            app.Use(async (context, next) =>
-            {
-                var token = context.Session.GetString("Token");
-                if (!string.IsNullOrEmpty(token))
-                {
-                    context.Request.Headers.Add("Authorization", "Bearer " + token);
-                }
-                await next();
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    var token = context.Session.GetString("Token");
+            //    if (!string.IsNullOrEmpty(token))
+            //    {
+            //        context.Request.Headers.Add("Authorization", "Bearer " + token);
+            //    }
+            //    await next();
+            //});
 
             app.UseStaticFiles();
 

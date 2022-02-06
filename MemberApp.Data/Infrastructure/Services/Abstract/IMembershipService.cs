@@ -9,6 +9,6 @@ namespace MemberApp.Data.Infrastructure.Services.Abstract
         MembershipContext ValidateMember(string username, string password);
         Member CreateMember(string username, string phoneNumber, string password, int[] roles);
         Member GetMember(int memberId);
-        List<Role> GetMemberRoles(string username);
+        List<string> GetMemberRoles(string username);
     }
 }

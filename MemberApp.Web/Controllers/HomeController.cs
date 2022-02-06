@@ -1,17 +1,19 @@
-﻿using MemberApp.Web.ViewModels;
+﻿using MemberApp.Data.Abstract;
+using MemberApp.Model.Entities;
+using MemberApp.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace MemberApp.Web.Controllers
 {
-    public class HomeController : Controller
+    [Authorize(Policy = "AdminOnly")]
+    public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            IRepository<AuditLog> loggingRepository)
+            : base(loggingRepository)
         {
-            _logger = logger;
         }
 
         public IActionResult Index()
