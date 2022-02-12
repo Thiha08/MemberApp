@@ -6,7 +6,6 @@ namespace MemberApp.Model.Entities
     public class ApplicationUser : IdentityUser
     {
         public bool IsLocked { get; set; }
-        public DateTime DateCreated { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         public virtual string CreatedBy { get; set; }

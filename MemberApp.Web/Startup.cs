@@ -1,11 +1,9 @@
 using MemberApp.Data;
 using MemberApp.Data.Abstract;
-using MemberApp.Data.Infrastructure;
+using MemberApp.Data.Infrastructure.Core.Settings;
 using MemberApp.Data.Infrastructure.Services;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Entities;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Security.Claims;
 using System.Text;
 
 namespace MemberApp.Web
@@ -36,6 +33,8 @@ namespace MemberApp.Web
         {
             services.AddSession();
 
+            services.AddHttpClient();
+
             services.AddHttpContextAccessor();
 
             string connectionString = Configuration.GetConnectionString("MemberAppDatabase");
@@ -53,8 +52,8 @@ namespace MemberApp.Web
                 // Password settings.
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
 
                 // Lockout settings.
                 //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
@@ -87,7 +86,7 @@ namespace MemberApp.Web
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // optional
 
                     options.LoginPath = "/Account/Login";
-                    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
                     options.SlidingExpiration = true;
                 })
                 .AddJwtBearer(options =>
@@ -131,6 +130,8 @@ namespace MemberApp.Web
 
             services.AddSwaggerGenNewtonsoftSupport();
 
+            services.Configure<SmsSettings>(Configuration.GetSection(nameof(SmsSettings)));
+
             // Repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -138,6 +139,7 @@ namespace MemberApp.Web
             //services.AddTransient<IMembershipService, MembershipService>();
             services.AddTransient<IEncryptionService, EncryptionService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<ISmsService, SmsService>();
 
             services.AddControllersWithViews();
         }

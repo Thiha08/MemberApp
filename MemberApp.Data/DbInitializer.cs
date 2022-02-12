@@ -45,7 +45,7 @@ namespace MemberApp.Data
             {
                 var user = new ApplicationUser();
                 user.UserName = "Admin";
-                IdentityResult userResult = userManager.CreateAsync(user, "welCome123").Result;
+                IdentityResult userResult = userManager.CreateAsync(user, "welcome123").Result;
 
                 var adminUser = userManager.FindByNameAsync(user.UserName).Result;
                 var role = roleManager.FindByNameAsync("Admin").Result;
