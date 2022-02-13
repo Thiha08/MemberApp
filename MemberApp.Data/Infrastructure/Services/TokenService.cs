@@ -10,14 +10,14 @@ namespace MemberApp.Data.Infrastructure.Services
 {
     public class TokenService : ITokenService
     {
-        private const double EXPIRY_DURATION_MINUTES = 30;
+        private const double EXPIRY_DURATION_MINUTES = 180;
 
         public string BuildToken(string key, string issuer, string username, string[] roles)
         {
             List<Claim> _claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                //new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
             };
 
             foreach (string role in roles)
