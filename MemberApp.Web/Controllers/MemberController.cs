@@ -39,18 +39,21 @@ namespace MemberApp.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            List<MemberOverviewViewModel> viewModel =
-                await _memberRepository.AllIncluding(x => x.User)
-                                       .Select(x => new MemberOverviewViewModel
-                                       {
-                                           Id = x.Id,
-                                           CadetNumber = x.CadetNumber,
-                                           FullName = x.FullName,
-                                           PhoneNumber = x.User.PhoneNumber,
-                                           Email = x.User.Email,
-                                           CadetBattalion = x.CadetBattalion
-                                       })
-                                       .ToListAsync();
+            List<MemberOverviewViewModel> viewModel = await _memberRepository
+                .AllIncluding(x => x.User)
+                .Select(x => new MemberOverviewViewModel
+                {
+                    Id = x.Id,
+                    BCNumber = x.BCNumber,
+                    FullName = x.FullName,
+                    LastBattalion = x.LastBattalion,
+                    PhoneNumber = x.User.PhoneNumber,
+                    CurrentCity = x.CurrentCity,
+                    LockingStatus = x.User.IsLocked ? "Locked" : "",
+                    RegisterationStatus = x.User.IsConfirmedByAdmin ? "Confirmed by Admin" :
+                        (x.User.PhoneNumberConfirmed ? "Pending Admin Confirmation" : "Pending Phone Number Confirmation")
+                })
+                .ToListAsync();
 
             return View(viewModel);
         }

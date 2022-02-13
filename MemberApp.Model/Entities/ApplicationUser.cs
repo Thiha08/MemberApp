@@ -10,6 +10,7 @@ namespace MemberApp.Model.Entities
         public DateTime UpdatedDate { get; set; }
         public virtual string CreatedBy { get; set; }
         public virtual string UpdatedBy { get; set; }
+        public bool IsConfirmedByAdmin { get; set; }
         public bool Status { get; set; }
     }
 }

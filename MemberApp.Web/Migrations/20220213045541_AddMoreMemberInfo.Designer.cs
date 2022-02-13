@@ -3,14 +3,16 @@ using System;
 using MemberApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemberApp.Web.Migrations
 {
     [DbContext(typeof(MemberAppContext))]
-    partial class MemberAppContextModelSnapshot : ModelSnapshot
+    [Migration("20220213045541_AddMoreMemberInfo")]
+    partial class AddMoreMemberInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,9 +402,6 @@ namespace MemberApp.Web.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsConfirmedByAdmin")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsLocked")
                         .HasColumnType("tinyint(1)");
