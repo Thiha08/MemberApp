@@ -13,7 +13,7 @@
 
             <div class="col-md-6">
                 <div class="card ">
-                    <div class="card-header card-header-dark card-header-icon">
+                    <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
                             <i class="material-icons">people</i>
                         </div>
@@ -31,19 +31,6 @@
                                 </div>
                             </div>
                         </div>
-
-                         <div class="row">
-                            <label asp-for="Email" class="col-md-3 col-form-label"></label>
-                            <div class="col-md-9">
-                                <div class="form-group">
-                                    <input asp-for="Email" class="form-control" />
-
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                    <span class="has-error form-control-feedback"><i class="material-icons">clear</i></span>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="row">
                             <label asp-for="PhoneNumber" class="col-md-3 col-form-label"></label>
                             <div class="col-md-9">
@@ -55,11 +42,19 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
+                            <label asp-for="Email" class="col-md-3 col-form-label"></label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input asp-for="Email" class="form-control" />
 
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                    <span class="has-error form-control-feedback"><i class="material-icons">clear</i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <label asp-for="Role" class="col-md-3 col-form-label"></label>
-
                             <div class="col-md-9">
                                 <div class="form-group" style="margin-top: 15px;">
 
@@ -83,7 +78,7 @@
                     <div class="card-footer ">
                         <div class="row">
                             <div class="col-md-9">
-                                <button type="submit" class="btn btn-fill btn-info">Create</button>
+                                <button type="submit" class="btn btn-fill btn-success">Create</button>
                             </div>
                         </div>
                     </div>

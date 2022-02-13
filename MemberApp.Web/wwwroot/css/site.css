@@ -288,3 +288,13 @@ div.dataTables_wrapper div.dataTables_paginate {
 .card.card-rotate.bg-dark .back {
     background: linear-gradient(60deg, #212121, #212121);
 }
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu a:hover,
+.dropdown-menu a:focus,
+.dropdown-menu a:active {
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(76, 175, 80, 0.4);
+    background-color: #4caf50;
+    color: #FFFFFF;
+}
