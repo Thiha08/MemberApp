@@ -10,7 +10,7 @@ namespace MemberApp.Model.Entities
         public string FullName { get; set; }
         public ServiceStatus ServiceStatus { get; set; }
         public string CurrentCity { get; set; }
-        public int CurrentJob { get; set; }
+        public string CurrentJob { get; set; }
         public string CadetNumber { get; set; }
         public string CadetBattalion { get; set; }
         public string Rank { get; set; }

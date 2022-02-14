@@ -2,7 +2,7 @@
 {
     public enum ProtectionStatus
     {
-        Submitted,
+        Pending,
         Approved,
         Rejected
     }
