@@ -1,6 +1,6 @@
-﻿namespace MemberApp.Web.ViewModels.Params
+﻿namespace MemberApp.Web.ViewModels.RequestDTOs
 {
-    public class LoginParams
+    public class LoginRequest
     {
         public string PhoneNumber { get; set; }
         public string Password { get; set; }

@@ -3,14 +3,16 @@ using System;
 using MemberApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemberApp.Web.Migrations
 {
     [DbContext(typeof(MemberAppContext))]
-    partial class MemberAppContextModelSnapshot : ModelSnapshot
+    [Migration("20220214081057_ModifyApplicationUserTable")]
+    partial class ModifyApplicationUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

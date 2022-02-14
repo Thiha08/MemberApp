@@ -1,9 +1,9 @@
 ﻿using MemberApp.Model.Constants;
 using System;
 
-namespace MemberApp.Web.ViewModels.Params
+namespace MemberApp.Web.ViewModels.RequestDTOs
 {
-    public class MemeberUpdateParams
+    public class MemeberUpdateRequest
     {
         public long Id { get; set; }
         public string FullName { get; set; }
