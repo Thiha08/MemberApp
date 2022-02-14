@@ -1,0 +1,53 @@
+﻿@model MemberOverviewViewModel
+
+<div class="card ">
+    <div class="card-header card-header-success card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">home_work</i>
+        </div>
+        <h4 class="card-title">Overview</h4>>
+    </div>
+    <div class="card-body ">
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">Name : </span>
+                <span>@Model.FullName</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">BC : </span>
+                <span>@Model.BCNumber</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">Phone Number : </span>
+                <span>@Model.PhoneNumber</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">Current City : </span>
+                <span>@Model.CurrentCity</span>
+            </div>
+        </div>
+         <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">Locking Status : </span>
+                <span>@Model.LockingStatus</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <span class="label-on-left">Registeration Status : </span>
+                <span>@Model.RegisterationStatus</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-fill btn-info pull-right" data-toggle="modal" data-target="#createJobModal">Add Job</button>
+            </div>
+        </div>
+    </div>
+</div>

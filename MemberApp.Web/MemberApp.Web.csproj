@@ -24,8 +24,4 @@
     <ProjectReference Include="..\MemberApp.Data\MemberApp.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Member\PartialViews\" />
-  </ItemGroup>
-
 </Project>

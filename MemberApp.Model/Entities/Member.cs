@@ -25,7 +25,7 @@ namespace MemberApp.Model.Entities
         public DateTime? CdmDate { get; set; }
         public DateTime? AbsenceStartedDate { get; set; }
         public DateTime? DateOfDeath { get; set; }
-        public DateTime? ReasonOfDeath { get; set; }
+        public string ReasonOfDeath { get; set; }
         public string BeneficiaryCity { get; set; }
         public string BeneficiaryPhoneNumber { get; set; }
         public ApplicationUser User { get; set; }

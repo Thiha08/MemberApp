@@ -1,0 +1,27 @@
+﻿@model MemberProtectionViewModel
+
+<div class="card">
+    <div class="card-header card-header-success card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">people</i>
+        </div>
+        <h4 class="card-title">Pending Changes</h4>
+    </div>
+    <div class="card-body">
+        <div class="toolbar text-right">
+            <a class="btn btn-success btn-create" asp-controller="Member" asp-action="AcceptAllChanges">
+                Approved All
+                <i class="material-icons">done_all</i>
+            </a>
+        </div>
+        <div class="material-datatables">
+            <div id="datatables_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                <div class="row">
+                    <div class="col-sm-12">
+                       @await Html.PartialAsync("~/Views/Member/ParitalViews/_ProtectionDetails.cshtml", Model.MemberProtectionDetails)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

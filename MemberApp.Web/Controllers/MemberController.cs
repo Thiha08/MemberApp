@@ -18,6 +18,7 @@ namespace MemberApp.Web.Controllers
     public class MemberController : BaseController
     {
         private readonly IRepository<Member> _memberRepository;
+        private readonly IRepository<MemberProtection> _memberProtectionRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ISmsService _smsService;
@@ -27,10 +28,12 @@ namespace MemberApp.Web.Controllers
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IRepository<Member> memberRepository,
+            IRepository<MemberProtection> memberProtectionRepository,
             ISmsService smsService)
             : base(loggingRepository)
         {
             _memberRepository = memberRepository;
+            _memberProtectionRepository = memberProtectionRepository;
             _userManager = userManager;
             _roleManager = roleManager;
             _smsService = smsService;
@@ -140,7 +143,52 @@ namespace MemberApp.Web.Controllers
             }
         }
 
-        public string GeneratePassword()
+        [HttpGet]
+        public async Task<ActionResult> Manage(long id)
+        {
+            var viewModel = new MemberManagementViewModel();
+
+            Member member = await _memberRepository.GetSingleAsync(id);
+
+            viewModel.MemberOverview = new MemberOverviewViewModel
+            {
+                Id = member.Id,
+                BCNumber = member.BCNumber,
+                FullName = member.FullName,
+                LastBattalion = member.LastBattalion,
+                PhoneNumber = member.User.PhoneNumber,
+                CurrentCity = member.CurrentCity,
+                LockingStatus = member.User.IsLocked ? "Locked" : "",
+                RegisterationStatus = member.User.IsConfirmedByAdmin ? "Confirmed by Admin" :
+                        (member.User.PhoneNumberConfirmed ? "Pending Admin Confirmation" : "Pending Phone Number Confirmation")
+            };
+
+            MemberProtection protection = await _memberProtectionRepository
+                .AllIncluding(x => x.ProtectionDetails)
+                .Where(x => x.Status)
+                .OrderBy(x => x.CreatedDate)
+                .FirstOrDefaultAsync();
+
+            viewModel.MemberProtection = new MemberProtectionViewModel
+            {
+                Id = protection.Id,
+                Status = protection.ProtectionStatus,
+                MemberProtectionDetails = protection.ProtectionDetails
+                    .Select(x => new MemberProtectionDetailViewModel
+                    {
+                        Id = x.Id,
+                        KeyName = x.KeyName,
+                        OldValue = x.OldValue,
+                        NewValue = x.NewValue,
+                        Status = x.ProtectionStatus
+                    })
+                    .ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        private string GeneratePassword()
         {
             var options = _userManager.Options.Password;
 

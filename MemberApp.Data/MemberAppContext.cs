@@ -16,10 +16,10 @@ namespace MemberApp.Data
         //{
 
         //}
-
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<MemberProtection> MemberProtections { get; set; }
+        public DbSet<MemberProtectionDetail> MemberProtectionDetails { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
 
         public MemberAppContext(DbContextOptions options) : base(options) { }
