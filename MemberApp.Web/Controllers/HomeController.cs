@@ -18,7 +18,8 @@ namespace MemberApp.Web.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Member");
+
         }
 
         public IActionResult Privacy()

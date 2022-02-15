@@ -1,4 +1,5 @@
-﻿using MemberApp.Data.Infrastructure.Core.Result;
+﻿using MemberApp.Data.Abstract;
+using MemberApp.Data.Infrastructure.Core.Result;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MemberApp.Web.ApiControllers
@@ -18,20 +20,72 @@ namespace MemberApp.Web.ApiControllers
     public class AccountApiController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<Member> _memberRepository;
         private readonly IConfiguration _config;
         private readonly ITokenService _tokenService;
         private readonly ISmsService _smsService;
        
         public AccountApiController(
             UserManager<ApplicationUser> userManager,
+            IRepository<Member> memberRepository,
             IConfiguration config,
             ITokenService tokenService,
             ISmsService smsService)
         {
             _userManager = userManager;
+            _memberRepository = memberRepository;
             _config = config;
             _tokenService = tokenService;
             _smsService = smsService;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
+        {
+            try
+            {
+                var exists = await _userManager.FindByNameAsync(request.PhoneNumber);
+
+                if (exists != null)
+                    throw new Exception("The phone number already exists");
+
+                var user = new ApplicationUser
+                {
+                    UserName = request.PhoneNumber,
+                    PhoneNumber = request.PhoneNumber,
+                    PhoneNumberConfirmed = false,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    IsConfirmedByAdmin = false,
+                    Status = true
+                };
+
+                string password = GeneratePassword();
+                var userResult = await _userManager.CreateAsync(user, password);
+
+                if (!userResult.Succeeded)
+                    throw new Exception("User creation failed, please contact admin");
+
+                await _userManager.AddToRoleAsync(user, "User");
+
+                var member = new Member
+                {
+                    ApplicationUserId = user.Id,
+                };
+
+                await _memberRepository.AddAsync(member);
+                await _memberRepository.CommitAsync();
+
+                // await _smsService.SendSMSAsync(user.PhoneNumber, $"Your password for member app is {password}.");
+
+                var result = Result.Ok("Registered successfully");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var result = Result.BadRequest(ex.Message);
+                return Ok(result);
+            }
         }
 
         [HttpPost("login")]
@@ -43,6 +97,9 @@ namespace MemberApp.Web.ApiControllers
 
                 if (user == null)
                     throw new Exception("Phone number or password is wrong");
+
+                if(!user.IsConfirmedByAdmin)
+                    throw new Exception("Please contact admin to confirm your account");
 
                 bool isValidPassword = await _userManager.CheckPasswordAsync(user, request.Password);
 
@@ -81,6 +138,9 @@ namespace MemberApp.Web.ApiControllers
                 if (user == null)
                     throw new Exception("Phone number or password is wrong");
 
+                if (!user.IsConfirmedByAdmin)
+                    throw new Exception("Please contact admin to confirm your account");
+
                 bool isValidOTP = CheckLoginOTPCode(user, request.OTPCode);
 
                 if (!isValidOTP)
@@ -93,6 +153,12 @@ namespace MemberApp.Web.ApiControllers
                     _config["Jwt:Issuer"].ToString(),
                     user.UserName,
                     roles.ToArray());
+
+                if (!user.PhoneNumberConfirmed)
+                    user.PhoneNumberConfirmed = true;
+
+                user.OTPCodeExpiryDate = DateTime.UtcNow; // release OTP code
+                await _userManager.UpdateAsync(user);
 
                 var result = Result<LoginDTO>.Ok(new LoginDTO
                 {
@@ -138,6 +204,48 @@ namespace MemberApp.Web.ApiControllers
         private bool CheckLoginOTPCode(ApplicationUser user, string otpCode)
         {
             return user.OTPCode == otpCode && user.OTPCodeExpiryDate >= DateTime.UtcNow;
+        }
+
+        private string GeneratePassword()
+        {
+            var options = _userManager.Options.Password;
+
+            int length = options.RequiredLength;
+
+            bool digit = options.RequireDigit;
+            bool lowercase = options.RequireLowercase;
+            bool uppercase = options.RequireUppercase;
+            bool nonAlphanumeric = options.RequireNonAlphanumeric;
+
+            var password = new StringBuilder();
+            var random = new Random();
+
+            while (password.Length < length)
+            {
+                char c = (char)random.Next(32, 126);
+
+                password.Append(c);
+
+                if (char.IsDigit(c))
+                    digit = false;
+                else if (char.IsLower(c))
+                    lowercase = false;
+                else if (char.IsUpper(c))
+                    uppercase = false;
+                else if (!char.IsLetterOrDigit(c))
+                    nonAlphanumeric = false;
+            }
+
+            if (nonAlphanumeric)
+                password.Append((char)random.Next(33, 48));
+            if (digit)
+                password.Append((char)random.Next(48, 58));
+            if (lowercase)
+                password.Append((char)random.Next(97, 123));
+            if (uppercase)
+                password.Append((char)random.Next(65, 91));
+
+            return password.ToString();
         }
     }
 }

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MemberApp.Web.ApiControllers
@@ -39,7 +40,7 @@ namespace MemberApp.Web.ApiControllers
                 IQueryable<Member> query = _memberRepository.GetAll()
                     .Where(x => x.Status);
 
-                if (string.IsNullOrWhiteSpace(keywords))
+                if (!string.IsNullOrWhiteSpace(keywords))
                     query = query.Where(x => x.FullName.Contains(keywords));
 
                 var membersVM = await query.Select(
@@ -98,15 +99,14 @@ namespace MemberApp.Web.ApiControllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(long id, MemeberUpdateRequest request)
+        [HttpPut]
+        public async Task<IActionResult> Put(MemeberUpdateRequest request)
         {
             try
             {
-                if (id != request.Id)
-                    throw new Exception("Member not found");
+                var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
 
-                Member member = await _memberRepository.GetSingleAsync(s => s.Id == id);
+                Member member = await _memberRepository.GetSingleAsync(s => s.User.UserName == userName, x => x.User);
 
                 if (member == null)
                     throw new Exception("Member not found");
@@ -386,7 +386,7 @@ namespace MemberApp.Web.ApiControllers
                     }
                 }
 
-                await _memberProtectionRepository.UpdateAsync(memberProtection);
+                await _memberProtectionRepository.AddAsync(memberProtection);
                 await _memberProtectionRepository.CommitAsync();
 
                 var result = Result.Ok();
