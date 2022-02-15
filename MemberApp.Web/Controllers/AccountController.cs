@@ -31,7 +31,7 @@ namespace MemberApp.Web.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Member");
             }
 
             return View();
@@ -59,7 +59,7 @@ namespace MemberApp.Web.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Member");
                     }
                 }
 
