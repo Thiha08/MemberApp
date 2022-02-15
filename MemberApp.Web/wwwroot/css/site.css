@@ -7,8 +7,8 @@ body {
 
 .main-panel > .content {
     margin-top: 30px;
+     padding: 0; 
 }
-
 
 .tim-typo {
     padding-left: 25%;
@@ -238,6 +238,14 @@ input:-webkit-autofill:active {
 
 
 /*Datatable*/
+table.dataTable thead .sorting_desc {
+    background-image: url(../img/sort_desc.png) !important;
+}
+
+table.dataTable thead .sorting {
+    background-image: url(../img/sort_both.png);
+}
+
 div.dataTables_wrapper div.dataTables_filter {
     text-align: right;
     margin-top: 20px;
@@ -297,4 +305,12 @@ div.dataTables_wrapper div.dataTables_paginate {
     box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(76, 175, 80, 0.4);
     background-color: #4caf50;
     color: #FFFFFF;
+}
+
+.member-details-table > tbody > tr > td {
+    border: none;
+}
+
+.member-details-table > tbody > tr > td:first-child {
+    font-weight: bold;
 }
