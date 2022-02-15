@@ -4,6 +4,8 @@ namespace MemberApp.Model.Constants
 {
     public static class Constants
     {
+        public const string DeletedProperty = "DP";
+
         public const string SystemTimeZone = "Myanmar Standard Time";
 
         public static string GenerateOTPCode
@@ -11,7 +13,7 @@ namespace MemberApp.Model.Constants
             get
             {
                 var random = new Random();
-                var verificationCode = random.Next(1000, 999999).ToString("D4");
+                var verificationCode = random.Next(1000, 9999).ToString("D4");
                 return verificationCode;
             }
         }
