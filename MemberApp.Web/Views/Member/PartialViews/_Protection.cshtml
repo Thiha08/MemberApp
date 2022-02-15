@@ -1,27 +1,59 @@
 ﻿@model MemberProtectionViewModel
 
+@{
+    ViewData["ProtectionId"] = Model.Id;
+}
+
 <div class="card">
     <div class="card-header card-header-success card-header-icon">
         <div class="card-icon">
-            <i class="material-icons">people</i>
+            <i class="material-icons">note_add</i>
         </div>
         <h4 class="card-title">Pending Changes</h4>
     </div>
     <div class="card-body">
-        <div class="toolbar text-right">
-            <a class="btn btn-success btn-create" asp-controller="Member" asp-action="AcceptAllChanges">
-                Approved All
-                <i class="material-icons">done_all</i>
-            </a>
-        </div>
+        @if (Model.MemberId > 0 && Model.Id > 0)
+        {
+            <div class="toolbar text-right">
+                <button type="button" class="btn btn-fill btn-success pull-right" data-toggle="modal" data-target="#approveAllModal">
+                    Approve All
+                    <i class="material-icons">done_all</i>
+                </button>
+            </div>
+        }
+
         <div class="material-datatables">
             <div id="datatables_wrapper" class="dataTables_wrapper dt-bootstrap4">
                 <div class="row">
                     <div class="col-sm-12">
-                       @await Html.PartialAsync("~/Views/Member/ParitalViews/_ProtectionDetails.cshtml", Model.MemberProtectionDetails)
+                        @await Html.PartialAsync("~/Views/Member/PartialViews/_ProtectionDetails.cshtml", Model.MemberProtectionDetails)
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="approveAllModal" tabindex="-1" role="dialog" aria-labelledby="approveAllModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="ApproveAllChanges" method="post">
+        <input type="hidden" name="MemberId" value="@Model.MemberId" />
+        <input type="hidden" name="ProtectionId" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to approve all changes for this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-success">Yes</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>

@@ -6,14 +6,36 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
-            @await Html.PartialAsync("~/Views/Member/ParitalViews/_Overview.cshtml", Model.MemberOverview)
+        <div class="col-md-4">
+            @await Html.PartialAsync("~/Views/Member/PartialViews/_Overview.cshtml", Model.MemberOverview)
         </div>
-        <div class="col-md-9">
-            @await Html.PartialAsync("~/Views/Member/ParitalViews/_Protection.cshtml", Model.MemberProtection)
+        <div class="col-md-8">
+            @await Html.PartialAsync("~/Views/Member/PartialViews/_Protection.cshtml", Model.MemberProtection)
         </div>
     </div>
     <div>
         <a class="back-to" asp-action="Index">Back to List</a>
     </div>
 </div>
+
+@section Scripts
+{
+<script>
+
+    $(function () {
+
+        $('#reject-button').on('click', function () {
+            debugger;
+            $('#rejectModal input[name="MemberId"]').val(@Model.MemberOverview.Id);
+            $('#rejectModal input[name="Id"]').val($(this).attr('item-id'));
+        });
+
+        $('#approve-button').on('click', function () {
+            debugger;
+            $('#approveModal input[name="MemberId"]').val(@ViewData["MemberId"]);
+            $('#approveModal input[name="Id"]').val($(this).attr('item-id'));
+        });
+    });
+
+</script>
+}

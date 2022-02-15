@@ -5,7 +5,6 @@ namespace MemberApp.Web.ViewModels.RequestDTOs
 {
     public class MemeberUpdateRequest
     {
-        public long Id { get; set; }
         public string FullName { get; set; }
         public ServiceStatus ServiceStatus { get; set; }
         public string PhoneNumber { get; set; }

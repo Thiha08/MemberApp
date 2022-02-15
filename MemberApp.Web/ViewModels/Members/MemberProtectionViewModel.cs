@@ -7,8 +7,10 @@ namespace MemberApp.Web.ViewModels.Members
     {
         public long Id { get; set; }
 
+        public long MemberId { get; set; }
+
         public ProtectionStatus Status { get; set; }
 
-        public List<MemberProtectionDetailViewModel> MemberProtectionDetails { get; set; }
+        public List<MemberProtectionDetailViewModel> MemberProtectionDetails { get; set; } = new List<MemberProtectionDetailViewModel>();
     }
 }

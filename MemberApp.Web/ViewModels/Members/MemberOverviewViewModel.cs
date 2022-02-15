@@ -8,7 +8,7 @@
         public string LastBattalion { get; set; }
         public string PhoneNumber { get; set; }
         public string CurrentCity { get; set; }
-        public string LockingStatus { get; set; }
-        public string RegisterationStatus { get; set; }
+        public bool IsLocked { get; set; }
+        public bool IsConfirmedByAdmin { get; set; }
     }
 }

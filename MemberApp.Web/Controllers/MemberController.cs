@@ -1,5 +1,7 @@
 ﻿using MemberApp.Data.Abstract;
+using MemberApp.Data.Infrastructure.Core.Extensions;
 using MemberApp.Data.Infrastructure.Services.Abstract;
+using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
 using MemberApp.Web.ViewModels.Members;
 using Microsoft.AspNetCore.Authorization;
@@ -52,9 +54,8 @@ namespace MemberApp.Web.Controllers
                     LastBattalion = x.LastBattalion,
                     PhoneNumber = x.User.PhoneNumber,
                     CurrentCity = x.CurrentCity,
-                    LockingStatus = x.User.IsLocked ? "Locked" : "",
-                    RegisterationStatus = x.User.IsConfirmedByAdmin ? "Confirmed by Admin" :
-                        (x.User.PhoneNumberConfirmed ? "Pending Admin Confirmation" : "Pending Phone Number Confirmation")
+                    IsLocked = x.User.IsLocked,
+                    IsConfirmedByAdmin = x.User.IsConfirmedByAdmin
                 })
                 .ToListAsync();
 
@@ -130,7 +131,7 @@ namespace MemberApp.Web.Controllers
                 await _memberRepository.AddAsync(member);
                 await _memberRepository.CommitAsync();
 
-                await _smsService.SendSMSAsync(user.PhoneNumber, $"Your password for member app is {password}.");
+                // await _smsService.SendSMSAsync(user.PhoneNumber, $"Your password for member app is {password}.");
 
                 GenerateAlertMessage(true, "The member is created successfully.");
 
@@ -148,7 +149,7 @@ namespace MemberApp.Web.Controllers
         {
             var viewModel = new MemberManagementViewModel();
 
-            Member member = await _memberRepository.GetSingleAsync(id);
+            Member member = await _memberRepository.GetSingleAsync(x => x.Id == id, x => x.User);
 
             viewModel.MemberOverview = new MemberOverviewViewModel
             {
@@ -158,22 +159,26 @@ namespace MemberApp.Web.Controllers
                 LastBattalion = member.LastBattalion,
                 PhoneNumber = member.User.PhoneNumber,
                 CurrentCity = member.CurrentCity,
-                LockingStatus = member.User.IsLocked ? "Locked" : "",
-                RegisterationStatus = member.User.IsConfirmedByAdmin ? "Confirmed by Admin" :
-                        (member.User.PhoneNumberConfirmed ? "Pending Admin Confirmation" : "Pending Phone Number Confirmation")
+                IsLocked = member.User.IsLocked,
+                IsConfirmedByAdmin = member.User.IsConfirmedByAdmin
             };
+
+            viewModel.MemberProtection = new MemberProtectionViewModel();
 
             MemberProtection protection = await _memberProtectionRepository
                 .AllIncluding(x => x.ProtectionDetails)
-                .Where(x => x.Status)
-                .OrderBy(x => x.CreatedDate)
+                .Where(x => x.Status && x.MemberId == member.Id)
+                .OrderByDescending(x => x.CreatedDate)
                 .FirstOrDefaultAsync();
 
-            viewModel.MemberProtection = new MemberProtectionViewModel
+            if (protection != null)
             {
-                Id = protection.Id,
-                Status = protection.ProtectionStatus,
-                MemberProtectionDetails = protection.ProtectionDetails
+                viewModel.MemberProtection = new MemberProtectionViewModel
+                {
+                    Id = protection.Id,
+                    MemberId = protection.MemberId,
+                    Status = protection.ProtectionStatus,
+                    MemberProtectionDetails = protection.ProtectionDetails
                     .Select(x => new MemberProtectionDetailViewModel
                     {
                         Id = x.Id,
@@ -183,10 +188,267 @@ namespace MemberApp.Web.Controllers
                         Status = x.ProtectionStatus
                     })
                     .ToList()
-            };
+                };
+            }
 
             return View(viewModel);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Confirm(ConfirmMemberViewModel viewModel)
+        {
+            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.User.IsConfirmedByAdmin = true;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Lock(LockMemberViewModel viewModel)
+        {
+            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.User.IsLocked = true;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            GenerateAlertMessage(true, "Member locked");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Unlock(UnlockMemberViewModel viewModel)
+        {
+            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.User.IsLocked = false;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            GenerateAlertMessage(true, "Member unlocked");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ApproveAllChanges(ApproveAllChangesViewModel viewModel)
+        {
+            Member member = await _memberRepository
+                .GetSingleAsync(x => x.Id == viewModel.MemberId, x => x.User);
+
+            MemberProtection memberProtection = await _memberProtectionRepository
+                .GetSingleAsync(x => x.Id == viewModel.ProtectionId, x => x.ProtectionDetails);
+
+            if(member == null || memberProtection == null || memberProtection.ProtectionDetails == null)
+            {
+                GenerateAlertMessage(true, "Failed to update changes");
+                return RedirectToAction(nameof(Manage), new { id = viewModel.MemberId });
+            }
+
+            List<MemberProtectionDetail> changes = memberProtection.ProtectionDetails
+                .Where(x => x.ProtectionStatus == ProtectionStatus.Pending && x.NewValue != x.OldValue)
+                .ToList();
+
+            var memberViewModel = new MemberViewModel();
+
+            foreach (var change in changes)
+            {
+                ReflectionExtensions.TrySetProtectionValue(memberViewModel, change.KeyName, change.NewValue);
+            }
+
+            if (!string.IsNullOrWhiteSpace(memberViewModel.FullName))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.FullName));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.FullName = memberViewModel.FullName != Constants.DeletedProperty ? memberViewModel.FullName : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.CurrentCity))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.CurrentCity));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.CurrentCity = memberViewModel.CurrentCity != Constants.DeletedProperty ? memberViewModel.CurrentCity : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.CurrentJob))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.CurrentJob));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.CurrentJob = memberViewModel.CurrentJob != Constants.DeletedProperty ? memberViewModel.CurrentJob : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.CadetNumber))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.CadetNumber));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.CadetNumber = memberViewModel.CadetNumber != Constants.DeletedProperty ? memberViewModel.CadetNumber : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.CadetBattalion))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.CadetBattalion));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.CadetBattalion = memberViewModel.CadetBattalion != Constants.DeletedProperty ? memberViewModel.CadetBattalion : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.Rank))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.Rank));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.Rank = memberViewModel.Rank != Constants.DeletedProperty ? memberViewModel.Rank : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.BCNumber))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.BCNumber));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.BCNumber = memberViewModel.BCNumber != Constants.DeletedProperty ? memberViewModel.BCNumber : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.LastBattalion))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.LastBattalion));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.LastBattalion = memberViewModel.LastBattalion != Constants.DeletedProperty ? memberViewModel.LastBattalion : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.ResignationDate))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.ResignationDate));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.ResignationDate = memberViewModel.ResignationDate != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.ResignationDate) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.ResignationReason))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.ResignationReason));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.ResignationReason = memberViewModel.ResignationReason != Constants.DeletedProperty ? memberViewModel.ResignationReason : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.RetiredDate))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.RetiredDate));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.RetiredDate = memberViewModel.RetiredDate != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.RetiredDate) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.RetiredReason))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.RetiredReason));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.RetiredReason = memberViewModel.RetiredReason != Constants.DeletedProperty ? memberViewModel.RetiredReason : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.DismissedDate))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.DismissedDate));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.DismissedDate = memberViewModel.DismissedDate != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.DismissedDate) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.DismissedReason))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.DismissedReason));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.DismissedReason = memberViewModel.DismissedReason != Constants.DeletedProperty ? memberViewModel.DismissedReason : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.CdmDate))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.CdmDate));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.CdmDate = memberViewModel.CdmDate != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.CdmDate) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.AbsenceStartedDate))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.AbsenceStartedDate));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.AbsenceStartedDate = memberViewModel.AbsenceStartedDate != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.AbsenceStartedDate) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.DateOfDeath))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.DateOfDeath));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.DateOfDeath = memberViewModel.DateOfDeath != Constants.DeletedProperty ? DateTime.Parse(memberViewModel.DateOfDeath) : null;
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.ReasonOfDeath))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.ReasonOfDeath));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.ReasonOfDeath = memberViewModel.ReasonOfDeath != Constants.DeletedProperty ? memberViewModel.ReasonOfDeath : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.BeneficiaryCity))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.BeneficiaryCity));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.BeneficiaryCity = memberViewModel.BeneficiaryCity != Constants.DeletedProperty ? memberViewModel.BeneficiaryCity : "";
+            }
+            if (!string.IsNullOrWhiteSpace(memberViewModel.BeneficiaryPhoneNumber))
+            {
+                var protection = changes.FirstOrDefault(x => x.KeyName == nameof(member.BeneficiaryPhoneNumber));
+                protection.ProtectionStatus = ProtectionStatus.Approved;
+
+                member.BeneficiaryPhoneNumber = memberViewModel.BeneficiaryPhoneNumber != Constants.DeletedProperty ? memberViewModel.BeneficiaryPhoneNumber : "";
+            }
+
+            await _memberProtectionRepository.UpdateAsync(memberProtection);
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            GenerateAlertMessage(true, "Approved all changes successfully");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.MemberId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Approve(ApproveViewModel viewModel)
+        {
+            GenerateAlertMessage(true, "Approved successfully");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.MemberId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Reject(RejectViewModel viewModel)
+        {
+            GenerateAlertMessage(true, "Rejected successfully");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.MemberId });
+        }
+
+
 
         private string GeneratePassword()
         {
