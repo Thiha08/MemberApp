@@ -51,11 +51,10 @@ namespace MemberApp.Web.Controllers
                     Id = x.Id,
                     BCNumber = x.BCNumber,
                     FullName = x.FullName,
-                    LastBattalion = x.LastBattalion,
+                    CurrentStatus = x.ServiceStatus.ToDescription(),
+                    Division = "",
                     PhoneNumber = x.User.PhoneNumber,
-                    CurrentCity = x.CurrentCity,
-                    IsLocked = x.User.IsLocked,
-                    IsConfirmedByAdmin = x.User.IsConfirmedByAdmin
+                    Request = ""
                 })
                 .ToListAsync();
 
@@ -156,11 +155,11 @@ namespace MemberApp.Web.Controllers
                 Id = member.Id,
                 BCNumber = member.BCNumber,
                 FullName = member.FullName,
-                LastBattalion = member.LastBattalion,
-                PhoneNumber = member.User.PhoneNumber,
-                CurrentCity = member.CurrentCity,
-                IsLocked = member.User.IsLocked,
-                IsConfirmedByAdmin = member.User.IsConfirmedByAdmin
+                //LastBattalion = member.LastBattalion,
+                //PhoneNumber = member.User.PhoneNumber,
+                //CurrentCity = member.CurrentCity,
+                //IsLocked = member.User.IsLocked,
+                //IsConfirmedByAdmin = member.User.IsConfirmedByAdmin
             };
 
             viewModel.MemberProtection = new MemberProtectionViewModel();

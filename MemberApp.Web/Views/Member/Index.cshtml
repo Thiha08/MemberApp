@@ -1,4 +1,6 @@
-﻿@model IEnumerable<MemberOverviewViewModel>
+﻿@inject IViewLocalizer Localizer
+
+@model IEnumerable<MemberOverviewViewModel>
 
 @{
     ViewData["Title"] = "Members";
@@ -12,12 +14,12 @@
                     <div class="card-icon">
                         <i class="material-icons">people</i>
                     </div>
-                    <h4 class="card-title">Members</h4>
+                    <h4 class="card-title">@Localizer["Members"]</h4>
                 </div>
                 <div class="card-body">
                     <div class="toolbar text-right">
                         <a class="btn btn-success btn-create" asp-controller="Member" asp-action="Create">
-                            New
+                            ADD
                             <i class="material-icons">keyboard_arrow_right</i>
                         </a>
                     </div>
@@ -29,55 +31,65 @@
                                         <thead>
                                             <tr role="row">
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.BCNumber)
+                                                    @Localizer["Id"]
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.FullName)
+                                                    @Localizer["BCNumber"]
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.LastBattalion)
+                                                    @Localizer["Rank"]
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                                    @Localizer["FullName"]
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.CurrentCity)
+                                                    @Localizer["CurrentStatus"]
+                                                </th>
+                                                 <th>
+                                                    @Localizer["Division"]
                                                 </th>
                                                 <th>
-                                                    Locking Status
+                                                    @Localizer["PhoneNumber"]
                                                 </th>
                                                 <th>
-                                                    Registeration Status
+                                                    @Localizer["Request"]
                                                 </th>
-                                                <th></th>
+                                                <th>
+                                                    @Localizer["Details"]
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @if (Model.Any())
                                             {
+                                                int index = 0;
                                                 foreach (var item in Model)
                                                 {
+                                                    index++;
                                                     <tr role="row" data-cropproductionid="@item.Id" style="">
+                                                        <td>
+                                                            @index
+                                                        </td>
                                                         <td tabindex="0" class="sorting_1">
                                                             @Html.DisplayFor(modelItem => item.BCNumber)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Rank)
                                                         </td>
                                                         <td>
                                                             @Html.DisplayFor(modelItem => item.FullName)
                                                         </td>
                                                         <td>
-                                                            @Html.DisplayFor(modelItem => item.LastBattalion)
+                                                            @Html.DisplayFor(modelItem => item.CurrentStatus)
+                                                        </td>
+                                                         <td>
+                                                            @Html.DisplayFor(modelItem => item.Division)
                                                         </td>
                                                         <td>
                                                             @Html.DisplayFor(modelItem => item.PhoneNumber)
                                                         </td>
                                                         <td>
-                                                            @Html.DisplayFor(modelItem => item.CurrentCity)
-                                                        </td>
-                                                        <td>
-                                                            @(item.IsLocked ? "Locked": "Unlocked")
-                                                        </td>
-                                                        <td>
-                                                           @(item.IsConfirmedByAdmin ? "Confirmed" : "Unconfirm")
+                                                            @Html.DisplayFor(modelItem => item.Request)
                                                         </td>
                                                         <td class="td-actions text-right">
                                                             <a asp-action="Manage" asp-route-id="@item.Id"

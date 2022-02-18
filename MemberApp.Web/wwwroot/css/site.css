@@ -2,12 +2,32 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 body {
-    font-family: "Assistant", sans-serif;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td {
+    font-family: 'Noto Sans Myanmar', sans-serif;
+    vertical-align: middle;
+    border-color: #ddd;
+}
+
+.table thead tr th {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.table thead tr td {
+    font-weight: 400;
+    font-size: 12px;
 }
 
 .main-panel > .content {
     margin-top: 30px;
-     padding: 0; 
+    padding: 0;
 }
 
 .tim-typo {
@@ -311,6 +331,6 @@ div.dataTables_wrapper div.dataTables_paginate {
     border: none;
 }
 
-.member-details-table > tbody > tr > td:first-child {
-    font-weight: bold;
-}
+    .member-details-table > tbody > tr > td:first-child {
+        font-weight: bold;
+    }

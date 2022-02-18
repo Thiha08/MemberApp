@@ -9,13 +9,18 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace MemberApp.Web
@@ -155,7 +160,22 @@ namespace MemberApp.Web
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<ISmsService, SmsService>();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
+
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en-US"),
+                        new CultureInfo("mm")
+                    };
+
+                options.DefaultRequestCulture = new RequestCulture("mm");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -188,6 +208,15 @@ namespace MemberApp.Web
             //    }
             //    await next();
             //});
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("mm"),
+            };
+
+            var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
 
             app.UseStaticFiles();
 
