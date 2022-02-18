@@ -9,9 +9,6 @@
         <div class="col-md-4">
             @await Html.PartialAsync("~/Views/Member/PartialViews/_Overview.cshtml", Model.MemberOverview)
         </div>
-        <div class="col-md-8">
-            @await Html.PartialAsync("~/Views/Member/PartialViews/_Protection.cshtml", Model.MemberProtection)
-        </div>
     </div>
     <div>
         <a class="back-to" asp-action="Index">Back to List</a>

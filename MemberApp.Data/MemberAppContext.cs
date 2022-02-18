@@ -18,8 +18,6 @@ namespace MemberApp.Data
         //}
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Member> Members { get; set; }
-        public DbSet<MemberProtection> MemberProtections { get; set; }
-        public DbSet<MemberProtectionDetail> MemberProtectionDetails { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; }

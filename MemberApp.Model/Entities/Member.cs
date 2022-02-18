@@ -1,6 +1,5 @@
 ﻿using MemberApp.Model.Constants;
 using System;
-using System.Collections.Generic;
 
 namespace MemberApp.Model.Entities
 {
@@ -29,6 +28,5 @@ namespace MemberApp.Model.Entities
         public string BeneficiaryCity { get; set; }
         public string BeneficiaryPhoneNumber { get; set; }
         public ApplicationUser User { get; set; }
-        public ICollection<MemberProtection> Protections { get; set; }
     }
 }
