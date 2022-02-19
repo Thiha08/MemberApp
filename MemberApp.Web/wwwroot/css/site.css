@@ -5,6 +5,9 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.sidebar .nav i {
+    text-align: left;
+}
 
 .table > thead > tr > th,
 .table > tbody > tr > th,
@@ -26,7 +29,7 @@ body {
 }
 
 .main-panel > .content {
-    margin-top: 30px;
+    /*margin-top: 30px;*/
     padding: 0;
 }
 

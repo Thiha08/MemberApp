@@ -31,6 +31,7 @@
 
                 <li class="nav-item @(controllerName == "Member" ? "active" : "")">
                     <a class="nav-link" asp-controller="Member" asp-action="Index">
+                        <i class="material-icons">groups</i>
                         <p>Home</p>
                     </a>
                 </li>
@@ -38,7 +39,15 @@
                 
                 <li class="nav-item @(controllerName == "Notification" ? "active" : "")">
                     <a class="nav-link" asp-controller="Notification" asp-action="Index">
+                        <i class="material-icons">notifications</i>
                         <p>Notification</p>
+                    </a>
+                </li>
+
+                <li class="nav-item @(controllerName == "Setting" ? "active" : "")">
+                    <a class="nav-link" asp-controller="Setting" asp-action="Index">
+                        <i class="material-icons">settings</i>
+                        <p>Setting</p>
                     </a>
                 </li>
             }
