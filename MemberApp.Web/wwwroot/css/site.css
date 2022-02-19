@@ -258,14 +258,51 @@ input:-webkit-autofill:active {
 
 
 /*Datatable*/
-table.dataTable thead .sorting_desc {
-    background-image: url(../img/sort_desc.png) !important;
+table.dataTable thead .sorting {
+    cursor: pointer;
 }
 
-table.dataTable thead .sorting {
+table.dataTable thead .sorting_asc {
+    cursor: pointer;
+    background-image: none !important;
+}
+
+
+table.dataTable thead .sorting_desc {
+    cursor: pointer;
+    background-image: none !important;
+}
+
+table.dataTable thead th .arrow_drop_up,
+table.dataTable thead th .arrow_drop_down {
+    display: none;
+    line-height: 0;
+    top: 15px;
+    position: absolute;
+}
+
+table.dataTable thead th.sorting_asc .arrow_drop_up {
+    display: inline-block;
+}
+
+table.dataTable thead th.sorting_asc .arrow_drop_down {
+    display: none;
+}
+
+
+table.dataTable thead th.sorting_desc .arrow_drop_up {
+    display: none;
+}
+
+table.dataTable thead th.sorting_desc .arrow_drop_down {
+    display: inline-block;
+}
+
+
+/*table.dataTable thead .sorting {
     background-image: url(../img/sort_both.png);
 }
-
+*/
 div.dataTables_wrapper div.dataTables_filter {
     text-align: right;
     margin-top: 20px;

@@ -27,32 +27,48 @@
                         <div id="datatables_wrapper" class="dataTables_wrapper dt-bootstrap4">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <table id="datatables" class="crop-production-table table table-striped table-no-bordered table-hover dataTable dtr-inline scrolledTable" cellspacing="0" width="100%" style="width: 100%;" role="grid" aria-describedby="datatables_info">
+                                    <table id="crop-production-table" class="crop-production-table table table-striped table-no-bordered" cellspacing="0" width="100%" style="width: 100%;" role="grid" aria-describedby="datatables_info">
                                         <thead>
                                             <tr role="row">
                                                 <th>
                                                     @Localizer["Id"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["BCNumber"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["Rank"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["FullName"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["CurrentStatus"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
-                                                 <th>
+                                                <th>
                                                     @Localizer["Division"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["PhoneNumber"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["Request"]
+                                                    <i class="material-icons arrow_drop_up">arrow_drop_up</i>
+                                                    <i class="material-icons arrow_drop_down">arrow_drop_down</i>
                                                 </th>
                                                 <th>
                                                     @Localizer["Details"]
@@ -82,7 +98,7 @@
                                                         <td>
                                                             @Html.DisplayFor(modelItem => item.CurrentStatus)
                                                         </td>
-                                                         <td>
+                                                        <td>
                                                             @Html.DisplayFor(modelItem => item.Division)
                                                         </td>
                                                         <td>
@@ -91,7 +107,7 @@
                                                         <td>
                                                             @Html.DisplayFor(modelItem => item.Request)
                                                         </td>
-                                                        <td class="td-actions text-right">
+                                                        <td class="td-actions text-center">
                                                             <a asp-action="Manage" asp-route-id="@item.Id"
                                                        class="btn btn-link btn-success btn-just-icon edit">
                                                                 <i class="material-icons">manage_accounts</i>
@@ -121,3 +137,33 @@
         </div>
     </div>
 </div>
+
+@section Scripts
+{
+<script>
+
+    $(function () {
+
+        $('#crop-production-table').DataTable({
+            language: { search: "", searchPlaceholder: "Search..." },
+            "columns": [
+                { "width": "5%" },
+                { "width": "15%" },
+                { "width": "10%" },
+                { "width": "15%" },
+                { "width": "15%" },
+                { "width": "10%" },
+                { "width": "10%" },
+                { "width": "10%" },
+                null
+            ],
+            "columnDefs": [
+                { "orderable": false, "targets": 8 }
+            ]
+            //scrollX: true,
+            //scrollY: '40vh',
+        });
+    });
+
+</script>
+}
