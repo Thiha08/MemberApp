@@ -1,4 +1,6 @@
-﻿namespace MemberApp.Web.ViewModels.DTOs
+﻿using MemberApp.Model.Constants;
+
+namespace MemberApp.Web.ViewModels.DTOs
 {
     public class MemberOverviewDTO
     {
@@ -6,6 +8,6 @@
 
         public string FullName { get; set; }
 
-        public string ServiceStatus { get; set; }
+        public ServiceStatus ServiceStatus { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using MemberApp.Model.Constants;
 using System;
 
-namespace MemberApp.Web.ViewModels.DTOs
+namespace MemberApp.Model.ViewModels
 {
-    public class MemberDetailsDTO
+    public class MemberManagementViewModel
     {
         public long Id { get; set; }
         public string FullName { get; set; }
@@ -22,5 +22,6 @@ namespace MemberApp.Web.ViewModels.DTOs
         public string BeneficiaryPhoneNumber { get; set; }
         public DateTime? ActionDate { get; set; }
         public string ActionReason { get; set; }
+
     }
 }

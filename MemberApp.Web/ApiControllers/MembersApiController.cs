@@ -45,7 +45,7 @@ namespace MemberApp.Web.ApiControllers
                     {
                         Id = x.Id,
                         FullName = x.FullName,
-                        ServiceStatus = x.ServiceStatus.ToDescription()
+                        ServiceStatus = x.ServiceStatus
                     })
                     .OrderBy(x => x.FullName)
                     .ToListAsync();
@@ -74,17 +74,55 @@ namespace MemberApp.Web.ApiControllers
                 {
                     Id = member.Id,
                     FullName = member.FullName,
-                    ServiceStatus = member.ServiceStatus.ToDescription(),
                     PhoneNumber = member.User.PhoneNumber,
+                    PermanentContactNumber = member.PermanentContactNumber,
                     Email = member.User.Email,
-                    Rank = member.Rank,
-                    CurrentCity = member.CurrentCity,
+                    ServiceStatus = member.ServiceStatus,
+                    Address = member.Address,
+                    Job = member.Job,
                     CadetNumber = member.CadetNumber,
                     CadetBattalion = member.CadetBattalion,
+                    Rank = member.Rank,
                     BCNumber = member.BCNumber,
-                    LastBattalion = member.LastBattalion,
-                    CurrentJob = member.CurrentJob,
+                    Battalion = member.Battalion
                 };
+
+                if (member.ServiceStatus == ServiceStatus.Retired)
+                {
+                    memberDTO.ActionDate = member.RetiredDate;
+                    memberDTO.ActionReason = member.RetiredReason;
+                }
+                else if (member.ServiceStatus == ServiceStatus.Resigned)
+                {
+                    memberDTO.ActionDate = member.ResignationDate;
+                    memberDTO.ActionReason = member.ResignationReason;
+                }
+                else if (member.ServiceStatus == ServiceStatus.Dismissed)
+                {
+                    memberDTO.ActionDate = member.DismissedDate;
+                    memberDTO.ActionReason = member.DismissedReason;
+                }
+                else if (member.ServiceStatus == ServiceStatus.Absence)
+                {
+                    memberDTO.ActionDate = member.AbsenceStartedDate;
+                }
+                else if (member.ServiceStatus == ServiceStatus.CDM)
+                {
+                    memberDTO.ActionDate = member.CdmDate;
+                }
+                else if (member.ServiceStatus == ServiceStatus.Casualty)
+                {
+                    memberDTO.ActionDate = member.DateOfDeath;
+                    memberDTO.BeneficiaryAddress = member.BeneficiaryAddress;
+                    memberDTO.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
+                }
+                else if (member.ServiceStatus == ServiceStatus.Death)
+                {
+                    memberDTO.ActionDate = member.DateOfDeath;
+                    memberDTO.ActionReason = member.ReasonOfDeath;
+                    memberDTO.BeneficiaryAddress = member.BeneficiaryAddress;
+                    memberDTO.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
+                }
 
                 var result = Result<MemberDetailsDTO>.Ok(memberDTO);
                 return Ok(result);

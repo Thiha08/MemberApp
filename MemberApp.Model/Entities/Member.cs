@@ -8,13 +8,14 @@ namespace MemberApp.Model.Entities
         public string ApplicationUserId { get; set; }
         public string FullName { get; set; }
         public ServiceStatus ServiceStatus { get; set; }
-        public string CurrentCity { get; set; }
-        public string CurrentJob { get; set; }
+        public string PermanentContactNumber { get; set; }
+        public string Address { get; set; }
+        public string Job { get; set; }
         public string CadetNumber { get; set; }
         public string CadetBattalion { get; set; }
         public string Rank { get; set; }
         public string BCNumber { get; set; }
-        public string LastBattalion { get; set; }
+        public string Battalion { get; set; }
         public DateTime? ResignationDate { get; set; }
         public string ResignationReason { get; set; }
         public DateTime? RetiredDate { get; set; }
@@ -25,7 +26,7 @@ namespace MemberApp.Model.Entities
         public DateTime? AbsenceStartedDate { get; set; }
         public DateTime? DateOfDeath { get; set; }
         public string ReasonOfDeath { get; set; }
-        public string BeneficiaryCity { get; set; }
+        public string BeneficiaryAddress { get; set; }
         public string BeneficiaryPhoneNumber { get; set; }
         public ApplicationUser User { get; set; }
     }

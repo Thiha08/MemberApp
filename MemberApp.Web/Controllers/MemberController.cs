@@ -3,6 +3,7 @@ using MemberApp.Data.Infrastructure.Core.Extensions;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
+using MemberApp.Model.ViewModels;
 using MemberApp.Web.ViewModels.Members;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -143,21 +144,61 @@ namespace MemberApp.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Manage(long id)
         {
-            var viewModel = new MemberManagementViewModel();
-
             Member member = await _memberRepository.GetSingleAsync(x => x.Id == id, x => x.User);
 
-            viewModel.MemberOverview = new MemberOverviewViewModel
+            var viewModel = new MemberManagementViewModel
             {
                 Id = member.Id,
-                BCNumber = member.BCNumber,
                 FullName = member.FullName,
-                //LastBattalion = member.LastBattalion,
-                //PhoneNumber = member.User.PhoneNumber,
-                //CurrentCity = member.CurrentCity,
-                //IsLocked = member.User.IsLocked,
-                //IsConfirmedByAdmin = member.User.IsConfirmedByAdmin
+                PhoneNumber = member.User.PhoneNumber,
+                PermanentContactNumber = member.PermanentContactNumber,
+                Email = member.User.Email,
+                ServiceStatus = member.ServiceStatus,
+                Address = member.Address,
+                Job = member.Job,
+                CadetNumber = member.CadetNumber,
+                CadetBattalion = member.CadetBattalion,
+                Rank = member.Rank,
+                BCNumber = member.BCNumber,
+                Battalion = member.Battalion
             };
+
+            if(member.ServiceStatus == ServiceStatus.Retired)
+            {
+                viewModel.ActionDate = member.RetiredDate;
+                viewModel.ActionReason = member.RetiredReason;
+            }
+            else if(member.ServiceStatus == ServiceStatus.Resigned)
+            {
+                viewModel.ActionDate = member.ResignationDate;
+                viewModel.ActionReason = member.ResignationReason;
+            }
+            else if (member.ServiceStatus == ServiceStatus.Dismissed)
+            {
+                viewModel.ActionDate = member.DismissedDate;
+                viewModel.ActionReason = member.DismissedReason;
+            }
+            else if (member.ServiceStatus == ServiceStatus.Absence)
+            {
+                viewModel.ActionDate = member.AbsenceStartedDate;
+            }
+            else if (member.ServiceStatus == ServiceStatus.CDM)
+            {
+                viewModel.ActionDate = member.CdmDate;
+            }
+            else if (member.ServiceStatus == ServiceStatus.Casualty)
+            {
+                viewModel.ActionDate = member.DateOfDeath;
+                viewModel.BeneficiaryAddress = member.BeneficiaryAddress;
+                viewModel.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
+            }
+            else if (member.ServiceStatus == ServiceStatus.Death)
+            {
+                viewModel.ActionDate = member.DateOfDeath;
+                viewModel.ActionReason = member.ReasonOfDeath;
+                viewModel.BeneficiaryAddress = member.BeneficiaryAddress;
+                viewModel.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
+            }
 
             return View(viewModel);
         }

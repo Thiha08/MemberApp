@@ -1,4 +1,6 @@
-﻿@model MemberManagementViewModel
+﻿@inject IViewLocalizer Localizer
+
+@model MemberManagementViewModel
 
 @{
     ViewData["Title"] = "Member Management";
@@ -7,12 +9,264 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4">
-            @await Html.PartialAsync("~/Views/Member/PartialViews/_Overview.cshtml", Model.MemberOverview)
+            <div class="card card-profile card-member">
+                <div class="card-avatar">
+                    <a href="#pablo">
+                        <img class="img" src="/img/outline_person_outline.png">
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">@Model.FullName</h4>
+                    <h6 class="card-category text-gray">@Model.Rank</h6>
+                    <table class="contact-info-table table table-no-bordered dtr-inline" cellspacing="0" width="100%" style="width: 100%;" role="grid">
+                        <tbody>
+                            <tr role="row">
+                                <td>@Localizer["PhoneNumber"]</td>
+                                <td>@Model.PhoneNumber</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["Email"]</td>
+                                <td>@Model.Email</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["CurrentCity"]</td>
+                                <td>@Model.Address</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["PermantContactNumber"]</td>
+                                <td>@Model.PermanentContactNumber</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card ">
+                <div class="card-header card-header-success card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">perm_identity</i>
+                    </div>
+                    <h4 class="card-title"> @Localizer["PersonalInformation"]</h4>>
+                </div>
+                <div class="card-body ">
+                    <table class="personal-info-table table table-no-bordered dtr-inline" cellspacing="0" width="100%" style="width: 100%;" role="grid">
+                        <tbody>
+                            <tr role="row">
+                                <td>@Localizer["CadetNumber"]</td>
+                                <td>@Model.CadetNumber</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["CadetBattalion"]</td>
+                                <td>@Model.CadetBattalion</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["BCNumber"]</td>
+                                <td>@Model.BCNumber</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["Rank"]</td>
+                                <td>@Model.Rank</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["LastBattalion"]</td>
+                                <td>@Model.Battalion</td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["CurrentJob"]</td>
+                                <td>@Model.Job</td>
+                            </tr>
+
+                            @if (Model.ServiceStatus == ServiceStatus.Retired)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["RetiredDate"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["ResignationReason"]</td>
+                                    <td>@Model.ActionReason</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.Resigned)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["ResignationDate"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["ResignationReason"]</td>
+                                    <td>@Model.ActionReason</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.Dismissed)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["DismissedDate"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["DismissedReason"]</td>
+                                    <td>@Model.ActionReason</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.Absence)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["AbsenceStartedDate"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.CDM)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["CdmDate"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.Casualty)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["DateOfDeath"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["BeneficiaryAddress"]</td>
+                                    <td>@Model.BeneficiaryAddress</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["BeneficiaryPhoneNumber"]</td>
+                                    <td>@Model.BeneficiaryPhoneNumber</td>
+                                </tr>
+                            }
+                            else if (Model.ServiceStatus == ServiceStatus.Death)
+                            {
+                                <tr role="row">
+                                    <td>@Localizer["BeneficiaryPhoneNumber"]</td>
+                                    <td>@Model.BeneficiaryPhoneNumber</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["BeneficiaryPhoneNumber"]</td>
+                                    <td>@Model.BeneficiaryPhoneNumber</td>
+                                </tr>
+
+                                <tr role="row">
+                                    <td>@Localizer["DateOfDeath"]</td>
+                                    <td>@Model.ActionDate</td>
+                                </tr>
+                                <tr role="row">
+                                    <td>@Localizer["ReasonOfDeath"]</td>
+                                    <td>@Model.ActionReason</td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                    @* <div class="row">
+                        <div class="col-md-12">
+                        @if(Model.IsConfirmedByAdmin)
+                        {
+                        if(Model.IsLocked)
+                        {
+                        <button type="button" class="btn btn-fill btn-success pull-right" data-toggle="modal" data-target="#unlockMemberModal">
+                        Unlock
+                        <i class="material-icons">lock_open</i>
+                        </button>
+                        }
+                        else
+                        {
+                        <button type="button" class="btn btn-fill btn-danger pull-right" data-toggle="modal" data-target="#lockMemberModal">
+                        Lock
+                        <i class="material-icons">lock</i>
+                        </button>
+                        }
+                        }
+                        else
+                        {
+                        <button type="button" class="btn btn-fill btn-success pull-right" data-toggle="modal" data-target="#confirmMemberModal">
+                        Confirm
+                        <i class="material-icons">verified_user</i>
+                        </button>
+                        }
+                        </div>
+                        </div>*@
+                </div>
+            </div>
+
         </div>
     </div>
     <div>
         <a class="back-to" asp-action="Index">Back to List</a>
     </div>
+</div>
+
+<div class="modal fade" id="confirmMemberModal" tabindex="-1" role="dialog" aria-labelledby="confirmMemberModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="Confirm" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want confirm this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-success">Yes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="lockMemberModal" tabindex="-1" role="dialog" aria-labelledby="lockMemberModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="Lock" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to lock this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="unlockMemberModal" tabindex="-1" role="dialog" aria-labelledby="unlockMemberModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="Unlock" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to unlock this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-success">Yes</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts
@@ -21,17 +275,6 @@
 
     $(function () {
 
-        $('#reject-button').on('click', function () {
-            debugger;
-            $('#rejectModal input[name="MemberId"]').val(@Model.MemberOverview.Id);
-            $('#rejectModal input[name="Id"]').val($(this).attr('item-id'));
-        });
-
-        $('#approve-button').on('click', function () {
-            debugger;
-            $('#approveModal input[name="MemberId"]').val(@ViewData["MemberId"]);
-            $('#approveModal input[name="Id"]').val($(this).attr('item-id'));
-        });
     });
 
 </script>

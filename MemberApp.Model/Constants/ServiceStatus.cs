@@ -4,23 +4,26 @@ namespace MemberApp.Model.Constants
 {
     public enum ServiceStatus
     {
+        [Description("Undefined")]
+        Undefined,
+
         [Description("InService")]
         InService,
-
-        [Description("Resigned")]
-        Resigned,
 
         [Description("Retired")]
         Retired,
 
+        [Description("Resigned")]
+        Resigned,
+
         [Description("Dismissed")]
         Dismissed,
 
-        [Description("CDM")]
-        CDM,
-
         [Description("Absence")]
         Absence,
+
+        [Description("CDM")]
+        CDM,
 
         [Description("Casualty")]
         Casualty,

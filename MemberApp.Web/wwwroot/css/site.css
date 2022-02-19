@@ -371,3 +371,32 @@ div.dataTables_wrapper div.dataTables_paginate {
     .member-details-table > tbody > tr > td:first-child {
         font-weight: bold;
     }
+
+
+.personal-info-table,
+.contact-info-table {
+    text-align: left;
+}
+
+.personal-info-table tbody tr td,
+.contact-info-table tbody tr td {
+    white-space: normal;
+}
+
+.personal-info-table tbody tr td:first-child,
+.contact-info-table tbody tr td:first-child {
+    font-weight: 500;
+    width: 40%;
+}
+
+.card-member {
+    font-family: 'Noto Sans Myanmar', sans-serif;
+}
+
+.card-member .card-title {
+    font-weight: 500;
+    
+}
+
+.card-member .card-title {
+}
