@@ -1,7 +1,11 @@
-﻿@model MemberCreateViewModel
+﻿@inject IViewLocalizer Localizer
+
+@model MemberCreateViewModel
 
 @{
-    ViewData["Title"] = "New Worker";
+    ViewData["Title"] = "New Member";
+
+    var availableServiceStatus = EnumExtensions.GetValues<ServiceStatus>();
 
     var availableRoles = (List<IdentityRole>)ViewBag.Roles;
 }
@@ -15,14 +19,14 @@
                 <div class="card ">
                     <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">people</i>
+                            <i class="material-icons">admin_panel_settings</i>
                         </div>
-                        <h4 class="card-title">New Member</h4>
+                        <h4 class="card-title">@Localizer["MainInformation"]</h4>
                     </div>
                     <div class="card-body ">
                         <div class="row">
-                            <label asp-for="FullName" class="col-md-3 col-form-label"></label>
-                            <div class="col-md-9">
+                            <label asp-for="FullName" class="col-md-4 col-form-label">@Localizer["FullName"]</label>
+                            <div class="col-md-8">
                                 <div class="form-group">
                                     <input asp-for="FullName" class="form-control" />
 
@@ -31,9 +35,27 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <label asp-for="PhoneNumber" class="col-md-3 col-form-label"></label>
-                            <div class="col-md-9">
+                            <label asp-for="ServiceStatus" class="col-md-4 col-form-label">@Localizer["ServiceStatus"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <select asp-for="ServiceStatus" class="form-control myan-drop-down">
+                                        @foreach (var serviceStatus in availableServiceStatus)
+                                        {
+                                            <option value="@serviceStatus">@Localizer[serviceStatus.ToDescription()]</option>
+                                        }
+                                    </select>
+
+                                    <span asp-validation-for="ServiceStatus" class="text-danger"></span>
+                                    <span class="has-error form-control-feedback"><i class="material-icons">clear</i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="PhoneNumber" class="col-md-4 col-form-label">@Localizer["PhoneNumber"]</label>
+                            <div class="col-md-8">
                                 <div class="form-group">
                                     <input asp-for="PhoneNumber" class="form-control" />
 
@@ -42,20 +64,19 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <label asp-for="Email" class="col-md-3 col-form-label"></label>
-                            <div class="col-md-9">
+                            <label asp-for="Email" class="col-md-4 col-form-label"></label>
+                            <div class="col-md-8">
                                 <div class="form-group">
                                     <input asp-for="Email" class="form-control" />
-
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                    <span class="has-error form-control-feedback"><i class="material-icons">clear</i></span>
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <label asp-for="Role" class="col-md-3 col-form-label"></label>
-                            <div class="col-md-9">
+                            <label asp-for="Role" class="col-md-4 col-form-label"></label>
+                            <div class="col-md-8">
                                 <div class="form-group" style="margin-top: 15px;">
 
                                     @foreach (var role in availableRoles)
@@ -72,17 +93,143 @@
                                     }
                                 </div>
                                 <span asp-validation-for="Role" class="text-danger"></span>
+                                 <span class="has-error form-control-feedback"><i class="material-icons">clear</i></span>
                             </div>
                         </div>
                     </div>
+
                     <div class="card-footer ">
                         <div class="row">
-                            <div class="col-md-9">
+                            <div class="col-md-8">
                                 <button type="submit" class="btn btn-fill btn-success">Create</button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="card ">
+                    <div class="card-header card-header-success card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">assignment</i>
+                        </div>
+                        <h4 class="card-title">@Localizer["PersonalInformation"]</h4>
+                    </div>
+                    <div class="card-body ">
+
+                         <div class="row">
+                            <label asp-for="Address" class="col-md-4 col-form-label">@Localizer["CurrentCity"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="Address" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="PermanentContactNumber" class="col-md-4 col-form-label">@Localizer["PermantContactNumber"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="PermanentContactNumber" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="CadetNumber" class="col-md-4 col-form-label">@Localizer["CadetNumber"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="CadetNumber" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="CadetBattalion" class="col-md-4 col-form-label">@Localizer["CadetBattalion"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="CadetBattalion" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="BCNumber" class="col-md-4 col-form-label">@Localizer["BCNumber"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="BCNumber" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="Rank" class="col-md-4 col-form-label">@Localizer["Rank"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="Rank" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="Battalion" class="col-md-4 col-form-label">@Localizer["LastBattalion"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="Battalion" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label asp-for="Job" class="col-md-4 col-form-label">@Localizer["CurrentJob"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="Job" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="ActionDateRow" class="row">
+                            <label asp-for="ActionDate" class="col-md-4 col-form-label"></label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="ActionDate" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div id="ActionReasonRow" class="row">
+                            <label asp-for="ActionReason" class="col-md-4 col-form-label"></label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="ActionReason" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                         <div id="BeneficiaryAddressRow" class="row">
+                            <label asp-for="BeneficiaryAddress" class="col-md-4 col-form-label">@Localizer["BeneficiaryAddress"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="BeneficiaryAddress" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="BeneficiaryPhoneNumberRow" class="row">
+                            <label asp-for="BeneficiaryPhoneNumber" class="col-md-4 col-form-label">@Localizer["BeneficiaryPhoneNumber"]</label>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input asp-for="BeneficiaryPhoneNumber" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </form>
@@ -92,7 +239,84 @@
     </div>
 </div>
 
+@section Scripts
+{
+<script>
 
+    $(function () {
+        hideOnLoad();
+
+        $('#ServiceStatus').change(function () {
+            var value = $(this).val();
+            resetValues();
+            hideOnLoad();
+
+            if (value == '@ServiceStatus.Retired') {
+                $('label[for=ActionDate]').text('@Localizer["RetiredDate"]');
+                $('label[for=ActionReason]').text('@Localizer["RetiredReason"]');
+
+                $('#ActionDateRow').show();
+                $('#ActionReasonRow').show();
+            }
+            else if (value == '@ServiceStatus.Resigned') {
+                $('label[for=ActionDate]').text('@Localizer["ResignationDate"]');
+                $('label[for=ActionReason]').text('@Localizer["ResignationReason"]');
+
+                $('#ActionDateRow').show();
+                $('#ActionReasonRow').show();
+            }
+            else if (value == '@ServiceStatus.Dismissed') {
+                $('label[for=ActionDate]').text('@Localizer["DismissedDate"]');
+                $('label[for=ActionReason]').text('@Localizer["DismissedReason"]');
+
+                $('#ActionDateRow').show();
+                $('#ActionReasonRow').show();
+            }
+            else if (value == '@ServiceStatus.Absence') {
+                $('label[for=ActionDate]').text('@Localizer["AbsenceStartedDate"]');
+
+                $('#ActionDateRow').show();
+            }
+            else if (value == '@ServiceStatus.CDM') {
+                $('label[for=ActionDate]').text('@Localizer["CdmDate"]');
+
+                $("#ActionDateRow").show();
+            }
+            else if (value == '@ServiceStatus.Casualty') {
+                $('label[for=ActionDate]').text('@Localizer["DateOfDeath"]');
+                
+                $('#ActionDateRow').show();
+                $('#BeneficiaryAddress').show();
+                $('#BeneficiaryPhoneNumber').show();
+            }
+            else if (value == '@ServiceStatus.Death') {
+                $('label[for=ActionDate]').text('@Localizer["DateOfDeath"]');
+                $('label[for=ActionReason]').text('@Localizer["ReasonOfDeath"]');
+
+                $('#ActionDateRow').show();
+                $('#ActionReasonRow').show();
+                $('#BeneficiaryAddress').show();
+                $('#BeneficiaryPhoneNumber').show();
+            }
+        });
+    });
+
+    function hideOnLoad() {
+        $('#ActionDateRow').hide();
+        $('#ActionReasonRow').hide();
+        $('#BeneficiaryAddressRow').hide();
+        $('#BeneficiaryPhoneNumberRow').hide();
+    }
+
+    function resetValues() {
+        $('#ActionDate').val('');
+        $('#ActionReason').val('');
+        $('#BeneficiaryAddress').val('');
+        $('#BeneficiaryPhoneNumber').val('');
+    }
+
+</script>
+}
 
 
 

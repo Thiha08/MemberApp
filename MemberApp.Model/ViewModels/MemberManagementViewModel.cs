@@ -18,6 +18,7 @@ namespace MemberApp.Model.ViewModels
         public string Rank { get; set; }
         public string BCNumber { get; set; }
         public string Battalion { get; set; }
+        public string Division { get; set; }
         public string BeneficiaryAddress { get; set; }
         public string BeneficiaryPhoneNumber { get; set; }
         public DateTime? ActionDate { get; set; }

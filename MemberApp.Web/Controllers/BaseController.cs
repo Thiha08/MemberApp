@@ -1,7 +1,7 @@
 ﻿using MemberApp.Data.Abstract;
 using MemberApp.Model.Entities;
+using MemberApp.Model.ViewModels;
 using MemberApp.Web.ViewExtensions;
-using MemberApp.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;

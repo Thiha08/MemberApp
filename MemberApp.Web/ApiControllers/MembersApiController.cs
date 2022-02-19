@@ -1,10 +1,8 @@
 ﻿using MemberApp.Data.Abstract;
-using MemberApp.Data.Infrastructure.Core.Extensions;
 using MemberApp.Data.Infrastructure.Core.Result;
-using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
-using MemberApp.Web.ViewModels.DTOs;
-using MemberApp.Web.ViewModels.RequestDTOs;
+using MemberApp.Model.ResultModels;
+using MemberApp.Model.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +39,7 @@ namespace MemberApp.Web.ApiControllers
                     query = query.Where(x => x.FullName.Contains(keywords));
 
                 var membersVM = await query.Select(
-                    x => new MemberOverviewDTO
+                    x => new MemberOverviewResult
                     {
                         Id = x.Id,
                         FullName = x.FullName,
@@ -50,7 +48,7 @@ namespace MemberApp.Web.ApiControllers
                     .OrderBy(x => x.FullName)
                     .ToListAsync();
 
-                var result = Result<List<MemberOverviewDTO>>.Ok(membersVM);
+                var result = Result<List<MemberOverviewResult>>.Ok(membersVM);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -70,7 +68,7 @@ namespace MemberApp.Web.ApiControllers
                 if (member == null)
                     throw new Exception("Member not found");
 
-                var memberDTO = new MemberDetailsDTO
+                var viewModel = new MemberManagementViewModel
                 {
                     Id = member.Id,
                     FullName = member.FullName,
@@ -84,69 +82,14 @@ namespace MemberApp.Web.ApiControllers
                     CadetBattalion = member.CadetBattalion,
                     Rank = member.Rank,
                     BCNumber = member.BCNumber,
-                    Battalion = member.Battalion
+                    Battalion = member.Battalion,
+                    ActionDate = member.ActionDate,
+                    ActionReason = member.ActionReason,
+                    BeneficiaryAddress = member.BeneficiaryAddress,
+                    BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber
                 };
 
-                if (member.ServiceStatus == ServiceStatus.Retired)
-                {
-                    memberDTO.ActionDate = member.RetiredDate;
-                    memberDTO.ActionReason = member.RetiredReason;
-                }
-                else if (member.ServiceStatus == ServiceStatus.Resigned)
-                {
-                    memberDTO.ActionDate = member.ResignationDate;
-                    memberDTO.ActionReason = member.ResignationReason;
-                }
-                else if (member.ServiceStatus == ServiceStatus.Dismissed)
-                {
-                    memberDTO.ActionDate = member.DismissedDate;
-                    memberDTO.ActionReason = member.DismissedReason;
-                }
-                else if (member.ServiceStatus == ServiceStatus.Absence)
-                {
-                    memberDTO.ActionDate = member.AbsenceStartedDate;
-                }
-                else if (member.ServiceStatus == ServiceStatus.CDM)
-                {
-                    memberDTO.ActionDate = member.CdmDate;
-                }
-                else if (member.ServiceStatus == ServiceStatus.Casualty)
-                {
-                    memberDTO.ActionDate = member.DateOfDeath;
-                    memberDTO.BeneficiaryAddress = member.BeneficiaryAddress;
-                    memberDTO.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
-                }
-                else if (member.ServiceStatus == ServiceStatus.Death)
-                {
-                    memberDTO.ActionDate = member.DateOfDeath;
-                    memberDTO.ActionReason = member.ReasonOfDeath;
-                    memberDTO.BeneficiaryAddress = member.BeneficiaryAddress;
-                    memberDTO.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
-                }
-
-                var result = Result<MemberDetailsDTO>.Ok(memberDTO);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                var result = Result.BadRequest(ex.Message);
-                return Ok(result);
-            }
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Put(MemeberUpdateRequest request)
-        {
-            try
-            {
-                var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
-
-                Member member = await _memberRepository.GetSingleAsync(s => s.User.UserName == userName, x => x.User);
-
-                if (member == null)
-                    throw new Exception("Member not found");
-
-                var result = Result.Ok();
+                var result = Result<MemberManagementViewModel>.Ok(viewModel);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿namespace MemberApp.Web.ViewModels.RequestDTOs
+﻿namespace MemberApp.Model.RequestModels
 {
     public class OTPCodeRequest
     {

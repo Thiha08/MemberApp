@@ -24,6 +24,13 @@ namespace MemberApp.Data
         private static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             // create roles
+            if (!roleManager.RoleExistsAsync("SuperAdmin").Result)
+            {
+                IdentityRole role = new IdentityRole();
+                role.Name = "SuperAdmin";
+                IdentityResult roleResult = roleManager.CreateAsync(role).Result;
+            }
+
             if (!roleManager.RoleExistsAsync("Admin").Result)
             {
                 IdentityRole role = new IdentityRole();
@@ -41,14 +48,14 @@ namespace MemberApp.Data
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            if (userManager.FindByNameAsync("Admin").Result == null)
+            if (userManager.FindByNameAsync("SuperAdmin").Result == null)
             {
                 var user = new ApplicationUser();
-                user.UserName = "Admin";
+                user.UserName = "SuperAdmin";
                 IdentityResult userResult = userManager.CreateAsync(user, "welcome123").Result;
 
                 var adminUser = userManager.FindByNameAsync(user.UserName).Result;
-                var role = roleManager.FindByNameAsync("Admin").Result;
+                var role = roleManager.FindByNameAsync("SuperAdmin").Result;
                 if (role != null)
                 {
                     IdentityResult adminRoleResult = userManager.AddToRoleAsync(adminUser, role.Name).Result;

@@ -1,10 +1,11 @@
 ﻿using MemberApp.Model.Constants;
 using System;
 
-namespace MemberApp.Web.ViewModels.RequestDTOs
+namespace MemberApp.Model.ResultModels
 {
-    public class MemeberUpdateRequest
+    public class MemberResult
     {
+        public long Id { get; set; }
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }

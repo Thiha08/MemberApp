@@ -1,6 +1,6 @@
 ﻿using MemberApp.Data.Abstract;
 using MemberApp.Model.Entities;
-using MemberApp.Web.ViewModels;
+using MemberApp.Model.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;

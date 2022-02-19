@@ -117,34 +117,118 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Absence" xml:space="preserve">
+    <value>ခွင့်မဲ့</value>
+  </data>
+  <data name="AbsenceStartedDate" xml:space="preserve">
+    <value>စတင်ခွင့်မဲ့ ရက်စွဲ</value>
+  </data>
+  <data name="Battalion" xml:space="preserve">
+    <value>တပ်</value>
+  </data>
   <data name="BCNumber" xml:space="preserve">
-    <value>ပြန်တမ်းဝင်အမှတ်</value>
+    <value>ပြန်တမ်းဝင် အမှတ်</value>
   </data>
-  <data name="CurrentStatus" xml:space="preserve">
-    <value>လက်ရှိအ‌ခြေအနေ</value>
+  <data name="BeneficiaryAddress" xml:space="preserve">
+    <value>အမွေခံလိပ်စာ</value>
   </data>
-  <data name="Details" xml:space="preserve">
-    <value>အသေးစိတ်</value>
+  <data name="BeneficiaryPhoneNumber" xml:space="preserve">
+    <value>အမွေခံဖုန်း</value>
+  </data>
+  <data name="CadetBattalion" xml:space="preserve">
+    <value>ဗိုလ်လောင်း တပ်ရင်း၊ တပ်ခွဲ</value>
+  </data>
+  <data name="CadetNumber" xml:space="preserve">
+    <value>ဗိုလ်လောင်း အမှတ်</value>
+  </data>
+  <data name="Casualty" xml:space="preserve">
+    <value>ကျဆုံး</value>
+  </data>
+  <data name="CDM" xml:space="preserve">
+    <value>CDM</value>
+  </data>
+  <data name="CdmDate" xml:space="preserve">
+    <value>CDM စတင်ဆောင်ရွက်ခဲ့သည့် ရက်စွဲ</value>
+  </data>
+  <data name="ContactInformation" xml:space="preserve">
+    <value>ဆက်သွယ်ရန်အချက်အလက်</value>
+  </data>
+  <data name="CurrentCity" xml:space="preserve">
+    <value>လက်ရှိနေထိုင်သောမြို့</value>
+  </data>
+  <data name="CurrentJob" xml:space="preserve">
+    <value>လက်ရှိ အလုပ်အကိုင်</value>
+  </data>
+  <data name="DateOfDeath" xml:space="preserve">
+    <value>သေဆုံး ရက်စွဲ</value>
+  </data>
+  <data name="Death" xml:space="preserve">
+    <value>သေဆုံး</value>
+  </data>
+  <data name="Dismissed" xml:space="preserve">
+    <value>ထုတ်ပယ်</value>
+  </data>
+  <data name="DismissedDate" xml:space="preserve">
+    <value>ထုတ်ပယ်ခံရသည့် အကြောင်းအရင်း</value>
+  </data>
+  <data name="DismissedReason" xml:space="preserve">
+    <value>ထုတ်ပယ်ခံရသည့် ရက်စွဲ</value>
   </data>
   <data name="Division" xml:space="preserve">
     <value>တိုင်း</value>
   </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
   <data name="FullName" xml:space="preserve">
     <value>အမည်</value>
   </data>
-  <data name="Id" xml:space="preserve">
-    <value>စဉ်</value>
+  <data name="InService" xml:space="preserve">
+    <value>တာဝန်ထမ်းဆောင်ဆဲ</value>
   </data>
-  <data name="Members" xml:space="preserve">
-    <value>အဖွဲ့ဝင်များ</value>
+  <data name="LastBattalion" xml:space="preserve">
+    <value>နောက်ဆုံးတာဝန်ထမ်းဆောင်ခဲ့သောတပ်</value>
+  </data>
+  <data name="MainInformation" xml:space="preserve">
+    <value>အဓိကအချက်အလက်</value>
+  </data>
+  <data name="PermantContactNumber" xml:space="preserve">
+    <value>အမြဲတမ်း ဆက်သွယ်နိုင်သည့် နံပါတ်</value>
+  </data>
+  <data name="PersonalInformation" xml:space="preserve">
+    <value>ကိုယ်ရေးအချက်အလက်</value>
   </data>
   <data name="PhoneNumber" xml:space="preserve">
-    <value>ဖုန်းနံပါတ်</value>
+    <value>ဖုန်း</value>
   </data>
   <data name="Rank" xml:space="preserve">
     <value>အဆင့်</value>
   </data>
-  <data name="Request" xml:space="preserve">
-    <value>တောင်းဆိုမှု</value>
+  <data name="ReasonOfDeath" xml:space="preserve">
+    <value>သေဆုံးရသည့်အကြောင်းအရင်း</value>
+  </data>
+  <data name="ResignationDate" xml:space="preserve">
+    <value>နှုတ်ထွက်သည့် ရက်စွဲ</value>
+  </data>
+  <data name="ResignationReason" xml:space="preserve">
+    <value>နှုတ်ထွက်ရသည့် အကြောင်းအရင်း</value>
+  </data>
+  <data name="Resigned" xml:space="preserve">
+    <value>နှုတ်ထွက်</value>
+  </data>
+  <data name="Retired" xml:space="preserve">
+    <value>အငြိမ်းစား</value>
+  </data>
+  <data name="RetiredDate" xml:space="preserve">
+    <value>အနားယူသည့် ရက်စွဲ</value>
+  </data>
+  <data name="RetiredReason" xml:space="preserve">
+    <value>အနားယူရသည့် အကြောင်းအရင်း</value>
+  </data>
+  <data name="ServiceStatus" xml:space="preserve">
+    <value>လက်ရှိအ‌ခြေအနေ</value>
+  </data>
+  <data name="Undefined" xml:space="preserve">
+    <value />
   </data>
 </root>

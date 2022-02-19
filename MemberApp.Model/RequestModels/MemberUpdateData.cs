@@ -1,9 +1,9 @@
 ﻿using MemberApp.Model.Constants;
 using System;
 
-namespace MemberApp.Web.ViewModels.DTOs
+namespace MemberApp.Model.RequestModels
 {
-    public class MemberDetailsDTO
+    public class MemberUpdateData
     {
         public long Id { get; set; }
         public string FullName { get; set; }

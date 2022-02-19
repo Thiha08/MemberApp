@@ -3,8 +3,8 @@ using MemberApp.Data.Infrastructure.Core.Result;
 using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
-using MemberApp.Web.ViewModels.DTOs;
-using MemberApp.Web.ViewModels.RequestDTOs;
+using MemberApp.Model.RequestModels;
+using MemberApp.Model.ResultModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +40,7 @@ namespace MemberApp.Web.ApiControllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
+        public async Task<IActionResult> Register([FromBody] RegistrationData request)
         {
             try
             {
@@ -89,47 +89,7 @@ namespace MemberApp.Web.ApiControllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            try
-            {
-                var user = await _userManager.FindByNameAsync(request.PhoneNumber);
-
-                if (user == null)
-                    throw new Exception("Phone number or password is wrong");
-
-                if(!user.IsConfirmedByAdmin)
-                    throw new Exception("Please contact admin to confirm your account");
-
-                bool isValidPassword = await _userManager.CheckPasswordAsync(user, request.Password);
-
-                if(!isValidPassword)
-                    throw new Exception("Phone number or password is wrong");
-
-                var roles = await _userManager.GetRolesAsync(user);
-
-                var generatedToken = _tokenService.BuildToken(
-                    _config["Jwt:Key"].ToString(),
-                    _config["Jwt:Issuer"].ToString(),
-                    user.UserName,
-                    roles.ToArray());
-
-                var result = Result<LoginDTO>.Ok(new LoginDTO
-                {
-                    AccessToken = generatedToken
-                }, "Authentication succeeded");
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                var result = Result.BadRequest(ex.Message);
-                return Ok(result);
-            }
-        }
-
-        [HttpPost("loginWithOTP")]
-        public async Task<IActionResult> LoginWithOTP([FromBody] LoginWithOTPRequest request)
+        public async Task<IActionResult> LoginWithOTP([FromBody] LoginData request)
         {
             try
             {
@@ -160,7 +120,7 @@ namespace MemberApp.Web.ApiControllers
                 user.OTPCodeExpiryDate = DateTime.UtcNow; // release OTP code
                 await _userManager.UpdateAsync(user);
 
-                var result = Result<LoginDTO>.Ok(new LoginDTO
+                var result = Result<LoginResult>.Ok(new LoginResult
                 {
                     AccessToken = generatedToken
                 }, "Authentication succeeded");

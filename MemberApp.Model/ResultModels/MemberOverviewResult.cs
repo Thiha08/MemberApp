@@ -1,8 +1,8 @@
 ﻿using MemberApp.Model.Constants;
 
-namespace MemberApp.Web.ViewModels.DTOs
+namespace MemberApp.Model.ResultModels
 {
-    public class MemberOverviewDTO
+    public class MemberOverviewResult
     {
         public long Id { get; set; }
 

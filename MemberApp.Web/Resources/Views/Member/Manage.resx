@@ -159,6 +159,9 @@
   <data name="DismissedReason" xml:space="preserve">
     <value>ထုတ်ပယ်ခံရသည့် ရက်စွဲ</value>
   </data>
+  <data name="Division" xml:space="preserve">
+    <value>တိုင်း</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>Email</value>
   </data>
@@ -197,8 +200,5 @@
   </data>
   <data name="ServiceStatus" xml:space="preserve">
     <value>လက်ရှိအ‌ခြေအနေ</value>
-  </data>
-  <data name="State" xml:space="preserve">
-    <value>တိုင်း / ပြည်နယ်</value>
   </data>
 </root>

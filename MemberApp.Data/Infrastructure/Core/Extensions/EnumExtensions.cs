@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace MemberApp.Data.Infrastructure.Core.Extensions
 {
@@ -17,6 +19,16 @@ namespace MemberApp.Data.Infrastructure.Core.Extensions
             var memberInfo = type.GetMember(value.ToString());
             var attributes = memberInfo[0].GetCustomAttributes(typeof(T), false);
             return (T)attributes[0];
+        }
+
+        public static IEnumerable<T> GetValues<T>()
+        {
+            if (!typeof(T).IsEnum)
+            {
+                throw new Exception("T must be an Enumeration type.");
+            }
+
+            return Enum.GetValues(typeof(T)).Cast<T>();
         }
     }
 }

@@ -5,6 +5,11 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+label {
+    font-family: 'Noto Sans Myanmar', 'Roboto', sans-serif;
+    color: #034807;
+}
+
 .sidebar .nav i {
     text-align: left;
 }
@@ -16,11 +21,12 @@ body {
     font-family: 'Noto Sans Myanmar', sans-serif;
     vertical-align: middle;
     border-color: #ddd;
+    white-space: normal;
 }
 
 .table thead tr th {
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 14px;
 }
 
 .table thead tr td {
@@ -402,4 +408,15 @@ div.dataTables_wrapper div.dataTables_paginate {
 }
 
 .card-member .card-title {
+}
+
+/* Myanmar font Customize*/
+.myan-drop-down {
+    line-height: 1.8;
+}
+
+.bmd-form-group .form-control, 
+.bmd-form-group label, 
+.bmd-form-group input::placeholder {
+    line-height: 3;
 }

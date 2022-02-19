@@ -1,10 +1,8 @@
 ﻿using MemberApp.Data.Abstract;
 using MemberApp.Data.Infrastructure.Core.Extensions;
 using MemberApp.Data.Infrastructure.Services.Abstract;
-using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
 using MemberApp.Model.ViewModels;
-using MemberApp.Web.ViewModels.Members;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -89,9 +87,126 @@ namespace MemberApp.Web.Controllers
                 {
                     UserName = viewModel.PhoneNumber,
                     PhoneNumber = viewModel.PhoneNumber,
-                    PhoneNumberConfirmed = true,
                     Email = viewModel.Email,
-                    EmailConfirmed = true,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow,
+                    IsConfirmedByAdmin = true,
+                    Status = true
+                };
+
+                string password = GeneratePassword();
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    GenerateAlertMessage(false, "The member is failed to create");
+
+                    return View(viewModel);
+                }
+
+                var role = await _roleManager.FindByIdAsync(viewModel.Role);
+
+                if (role != null)
+                {
+                    await _userManager.AddToRoleAsync(user, role.Name);
+                }
+
+                var member = new Member
+                {
+                    ApplicationUserId = user.Id,
+                    FullName = viewModel.FullName,
+                    ServiceStatus = viewModel.ServiceStatus,
+                    PermanentContactNumber = viewModel.PermanentContactNumber,
+                    Address = viewModel.Address,
+                    Job = viewModel.Job,
+                    CadetNumber = viewModel.CadetNumber,
+                    CadetBattalion = viewModel.CadetBattalion,
+                    Rank = viewModel.Rank,
+                    BCNumber = viewModel.BCNumber,
+                    Battalion = viewModel.Battalion,
+                    Division = viewModel.Division,
+                    ActionDate = viewModel.ActionDate?.ToUniversalTime(),
+                    ActionReason = viewModel.ActionReason,
+                    BeneficiaryAddress = viewModel.BeneficiaryAddress,
+                    BeneficiaryPhoneNumber = viewModel.BeneficiaryPhoneNumber,
+                };
+
+                await _memberRepository.AddAsync(member);
+                await _memberRepository.CommitAsync();
+
+                // await _smsService.SendSMSAsync(user.PhoneNumber, $"Your password for member app is {password}.");
+
+                GenerateAlertMessage(true, "The member is created successfully.");
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                GenerateAlertMessage(false, ex.Message);
+                return View(viewModel);
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(long id)
+        {
+            ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+
+            Member member = await _memberRepository.GetSingleAsync(x => x.Id == id, x => x.User);
+
+            var viewModel = new MemberEditViewModel
+            {
+                Id = member.Id,
+                FullName = member.FullName,
+                PhoneNumber = member.User.PhoneNumber,
+                PermanentContactNumber = member.PermanentContactNumber,
+                Email = member.User.Email,
+                ServiceStatus = member.ServiceStatus,
+                Address = member.Address,
+                Job = member.Job,
+                CadetNumber = member.CadetNumber,
+                CadetBattalion = member.CadetBattalion,
+                Rank = member.Rank,
+                BCNumber = member.BCNumber,
+                Battalion = member.Battalion,
+                Division = member.Division,
+                ActionDate = member.ActionDate,
+                ActionReason = member.ActionReason,
+                BeneficiaryAddress = member.BeneficiaryAddress,
+                BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(MemberEditViewModel viewModel)
+        {
+            try
+            {
+                ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+
+                if (!ModelState.IsValid)
+                    return View(viewModel);
+
+                var exists = await _userManager.FindByNameAsync(viewModel.PhoneNumber);
+
+                if (exists != null)
+                {
+                    GenerateAlertMessage(false, "The phone number already exists");
+                    return View(viewModel);
+                }
+
+                var user = new ApplicationUser
+                {
+                    UserName = viewModel.PhoneNumber,
+                    PhoneNumber = viewModel.PhoneNumber,
+                    Email = viewModel.Email,
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     Status = true
@@ -122,7 +237,21 @@ namespace MemberApp.Web.Controllers
                 var member = new Member
                 {
                     ApplicationUserId = user.Id,
-                    FullName = viewModel.FullName
+                    FullName = viewModel.FullName,
+                    ServiceStatus = viewModel.ServiceStatus,
+                    PermanentContactNumber = viewModel.PermanentContactNumber,
+                    Address = viewModel.Address,
+                    Job = viewModel.Job,
+                    CadetNumber = viewModel.CadetNumber,
+                    CadetBattalion = viewModel.CadetBattalion,
+                    Rank = viewModel.Rank,
+                    BCNumber = viewModel.BCNumber,
+                    Battalion = viewModel.Battalion,
+                    Division = viewModel.Division,
+                    ActionDate = viewModel.ActionDate,
+                    ActionReason = viewModel.ActionReason,
+                    BeneficiaryAddress = viewModel.BeneficiaryAddress,
+                    BeneficiaryPhoneNumber = viewModel.BeneficiaryPhoneNumber,
                 };
 
                 await _memberRepository.AddAsync(member);
@@ -160,52 +289,21 @@ namespace MemberApp.Web.Controllers
                 CadetBattalion = member.CadetBattalion,
                 Rank = member.Rank,
                 BCNumber = member.BCNumber,
-                Battalion = member.Battalion
+                Battalion = member.Battalion,
+                Division = member.Division,
+                ActionDate = member.ActionDate,
+                ActionReason = member.ActionReason,
+                BeneficiaryAddress = member.BeneficiaryAddress,
+                BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber
             };
-
-            if(member.ServiceStatus == ServiceStatus.Retired)
-            {
-                viewModel.ActionDate = member.RetiredDate;
-                viewModel.ActionReason = member.RetiredReason;
-            }
-            else if(member.ServiceStatus == ServiceStatus.Resigned)
-            {
-                viewModel.ActionDate = member.ResignationDate;
-                viewModel.ActionReason = member.ResignationReason;
-            }
-            else if (member.ServiceStatus == ServiceStatus.Dismissed)
-            {
-                viewModel.ActionDate = member.DismissedDate;
-                viewModel.ActionReason = member.DismissedReason;
-            }
-            else if (member.ServiceStatus == ServiceStatus.Absence)
-            {
-                viewModel.ActionDate = member.AbsenceStartedDate;
-            }
-            else if (member.ServiceStatus == ServiceStatus.CDM)
-            {
-                viewModel.ActionDate = member.CdmDate;
-            }
-            else if (member.ServiceStatus == ServiceStatus.Casualty)
-            {
-                viewModel.ActionDate = member.DateOfDeath;
-                viewModel.BeneficiaryAddress = member.BeneficiaryAddress;
-                viewModel.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
-            }
-            else if (member.ServiceStatus == ServiceStatus.Death)
-            {
-                viewModel.ActionDate = member.DateOfDeath;
-                viewModel.ActionReason = member.ReasonOfDeath;
-                viewModel.BeneficiaryAddress = member.BeneficiaryAddress;
-                viewModel.BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber;
-            }
 
             return View(viewModel);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Confirm(ConfirmMemberViewModel viewModel)
+        public async Task<ActionResult> Confirm(MemberIdViewModel viewModel)
         {
             var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
@@ -225,7 +323,7 @@ namespace MemberApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Lock(LockMemberViewModel viewModel)
+        public async Task<ActionResult> Lock(MemberIdViewModel viewModel)
         {
             var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
@@ -246,7 +344,7 @@ namespace MemberApp.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Unlock(UnlockMemberViewModel viewModel)
+        public async Task<ActionResult> Unlock(MemberIdViewModel viewModel)
         {
             var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 

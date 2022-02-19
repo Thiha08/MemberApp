@@ -1,4 +1,4 @@
-﻿namespace MemberApp.Web.ViewModels
+﻿namespace MemberApp.Model.ViewModels
 {
     public class AlertViewModel
     {

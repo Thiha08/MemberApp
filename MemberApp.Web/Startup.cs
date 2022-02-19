@@ -114,7 +114,12 @@ namespace MemberApp.Web
                 // inline policies
                 options.AddPolicy("AdminOnly", builder =>
                 {
-                    builder.RequireRole("Admin");
+                    builder.RequireRole("SuperAdmin", "Admin");
+                });
+
+                options.AddPolicy("SuperAdminOnly", builder =>
+                {
+                    builder.RequireRole("SuperAdmin");
                 });
             });
 
