@@ -68,7 +68,7 @@ namespace MemberApp.Web.ApiControllers
                 if (member == null)
                     throw new Exception("Member not found");
 
-                var viewModel = new MemberManagementViewModel
+                var viewModel = new MemberDetailsViewModel
                 {
                     Id = member.Id,
                     FullName = member.FullName,
@@ -89,7 +89,7 @@ namespace MemberApp.Web.ApiControllers
                     BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber
                 };
 
-                var result = Result<MemberManagementViewModel>.Ok(viewModel);
+                var result = Result<MemberDetailsViewModel>.Ok(viewModel);
                 return Ok(result);
             }
             catch (Exception ex)

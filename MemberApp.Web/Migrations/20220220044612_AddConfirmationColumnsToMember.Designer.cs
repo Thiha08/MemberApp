@@ -3,14 +3,16 @@ using System;
 using MemberApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemberApp.Web.Migrations
 {
     [DbContext(typeof(MemberAppContext))]
-    partial class MemberAppContextModelSnapshot : ModelSnapshot
+    [Migration("20220220044612_AddConfirmationColumnsToMember")]
+    partial class AddConfirmationColumnsToMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,6 +69,9 @@ namespace MemberApp.Web.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("AllowedDateToUpdate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("varchar(255)");
 
@@ -100,17 +105,14 @@ namespace MemberApp.Web.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsRequestedToUpdate")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Job")
                         .HasColumnType("longtext");
 
                     b.Property<string>("PermanentContactNumber")
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("PermissionDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("PermissionStatus")
-                        .HasColumnType("int");
 
                     b.Property<string>("Rank")
                         .HasColumnType("longtext");

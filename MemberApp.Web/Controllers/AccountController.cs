@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemberApp.Web.Controllers
@@ -48,6 +49,14 @@ namespace MemberApp.Web.Controllers
                 {
                     return View(model);
                 }
+
+                var user = await _userManager.FindByNameAsync(model.UserName);
+
+                if (!user.IsConfirmedByAdmin)
+                    throw new Exception("Please contact super admin to confirm your account");
+
+                if (user.IsLocked)
+                    throw new Exception("Please contact super admin to unlock your account");
 
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, false);
 

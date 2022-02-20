@@ -14,11 +14,17 @@ label {
     text-align: left;
 }
 
+.form-control {
+    font-weight: 400;
+    font-family: 'Noto Sans Myanmar', 'Roboto', sans-serif;
+}
+
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > thead > tr > td,
 .table > tbody > tr > td {
     font-family: 'Noto Sans Myanmar', sans-serif;
+    font-weight: 400;
     vertical-align: middle;
     border-color: #ddd;
     white-space: normal;
@@ -371,6 +377,34 @@ div.dataTables_wrapper div.dataTables_paginate {
     box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(76, 175, 80, 0.4);
     background-color: #4caf50;
     color: #FFFFFF;
+}
+
+.btn.btn-icon-small {
+    height: 20px;
+    min-width: 20px;
+    width: 20px;
+    line-height: 20px;
+    font-size: 20px;
+}
+
+.btn.btn-icon-small .material-icons {
+    line-height: 20px;
+    font-size: 20px;
+}
+
+.btn.member-edit-button {
+    position: absolute;
+    z-index: 1;
+    top: 37px;
+    right: 29px;
+}
+
+.member-button {
+    top: -7px;
+}
+
+.pull-right {
+    float: right;
 }
 
 .member-details-table > tbody > tr > td {

@@ -21,6 +21,8 @@ namespace MemberApp.Model.Entities
         public string ActionReason { get; set; }
         public string BeneficiaryAddress { get; set; }
         public string BeneficiaryPhoneNumber { get; set; }
+        public PermissionStatus PermissionStatus { get; set; }
+        public DateTime? PermissionDate { get; set; }
         public ApplicationUser User { get; set; }
     }
 }

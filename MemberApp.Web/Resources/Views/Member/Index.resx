@@ -117,14 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Absence" xml:space="preserve">
+    <value>ခွင့်မဲ့</value>
+  </data>
   <data name="BCNumber" xml:space="preserve">
     <value>ပြန်တမ်းဝင်အမှတ်</value>
+  </data>
+  <data name="Casualty" xml:space="preserve">
+    <value>ကျဆုံး</value>
   </data>
   <data name="CurrentStatus" xml:space="preserve">
     <value>လက်ရှိအ‌ခြေအနေ</value>
   </data>
+  <data name="Death" xml:space="preserve">
+    <value>သေဆုံး</value>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>အသေးစိတ်</value>
+  </data>
+  <data name="Dismissed" xml:space="preserve">
+    <value>ထုတ်ပယ်</value>
   </data>
   <data name="Division" xml:space="preserve">
     <value>တိုင်း</value>
@@ -134,6 +146,9 @@
   </data>
   <data name="Id" xml:space="preserve">
     <value>စဉ်</value>
+  </data>
+  <data name="InService" xml:space="preserve">
+    <value>တာဝန်ထမ်းဆောင်ဆဲ</value>
   </data>
   <data name="Members" xml:space="preserve">
     <value>အဖွဲ့ဝင်များ</value>
@@ -146,5 +161,11 @@
   </data>
   <data name="Request" xml:space="preserve">
     <value>တောင်းဆိုမှု</value>
+  </data>
+  <data name="Resigned" xml:space="preserve">
+    <value>နှုတ်ထွက်</value>
+  </data>
+  <data name="Retired" xml:space="preserve">
+    <value>အငြိမ်းစား</value>
   </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿using MemberApp.Data.Abstract;
 using MemberApp.Data.Infrastructure.Core.Extensions;
 using MemberApp.Data.Infrastructure.Services.Abstract;
+using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
 using MemberApp.Model.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -42,13 +43,15 @@ namespace MemberApp.Web.Controllers
         {
             List<MemberOverviewViewModel> viewModel = await _memberRepository
                 .AllIncluding(x => x.User)
+                .Where(x => x.Status)
                 .Select(x => new MemberOverviewViewModel
                 {
                     Id = x.Id,
                     BCNumber = x.BCNumber,
                     FullName = x.FullName,
-                    CurrentStatus = x.ServiceStatus.ToDescription(),
-                    Division = "",
+                    Rank = x.Rank,
+                    CurrentStatus = x.ServiceStatus,
+                    Division = x.Division,
                     PhoneNumber = x.User.PhoneNumber,
                     Request = ""
                 })
@@ -60,7 +63,9 @@ namespace MemberApp.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Create()
         {
-            ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles = await _roleManager.Roles
+                .Where(x => x.Name != "SuperAdmin")
+                .ToListAsync();
 
             return View();
         }
@@ -70,7 +75,9 @@ namespace MemberApp.Web.Controllers
         {
             try
             {
-                ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+                ViewBag.Roles = await _roleManager.Roles
+                    .Where(x => x.Name != "SuperAdmin")
+                    .ToListAsync();
 
                 if (!ModelState.IsValid)
                     return View(viewModel);
@@ -155,9 +162,21 @@ namespace MemberApp.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Edit(long id)
         {
-            ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles = await _roleManager.Roles
+                .Where(x => x.Name != "SuperAdmin")
+                .ToListAsync();
 
             Member member = await _memberRepository.GetSingleAsync(x => x.Id == id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(member.User);
+
+            var role = await _roleManager.FindByNameAsync(userRoles.FirstOrDefault());
 
             var viewModel = new MemberEditViewModel
             {
@@ -166,6 +185,7 @@ namespace MemberApp.Web.Controllers
                 PhoneNumber = member.User.PhoneNumber,
                 PermanentContactNumber = member.PermanentContactNumber,
                 Email = member.User.Email,
+                Role = role.Id,
                 ServiceStatus = member.ServiceStatus,
                 Address = member.Address,
                 Job = member.Job,
@@ -189,72 +209,55 @@ namespace MemberApp.Web.Controllers
         {
             try
             {
-                ViewBag.Roles = await _roleManager.Roles.ToListAsync();
+                ViewBag.Roles = await _roleManager.Roles
+                    .Where(x => x.Name != "SuperAdmin")
+                    .ToListAsync();
 
                 if (!ModelState.IsValid)
                     return View(viewModel);
 
-                var exists = await _userManager.FindByNameAsync(viewModel.PhoneNumber);
+                Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
-                if (exists != null)
+                if (member == null)
                 {
-                    GenerateAlertMessage(false, "The phone number already exists");
-                    return View(viewModel);
+                    GenerateAlertMessage(false, "Member not found");
+                    return RedirectToAction(nameof(Index));
                 }
 
-                var user = new ApplicationUser
+                member.User.UserName = viewModel.PhoneNumber;
+                member.User.PhoneNumber = viewModel.PhoneNumber;
+                member.User.Email = viewModel.Email;
+                member.User.UpdatedDate = DateTime.UtcNow;
+
+                var userRoles = await _userManager.GetRolesAsync(member.User);
+
+                var oldRole = await _roleManager.FindByNameAsync(userRoles.FirstOrDefault());
+
+                var newRole = await _roleManager.FindByIdAsync(viewModel.Role);
+
+                if (newRole != null && oldRole.Id != newRole.Id)
                 {
-                    UserName = viewModel.PhoneNumber,
-                    PhoneNumber = viewModel.PhoneNumber,
-                    Email = viewModel.Email,
-                    CreatedDate = DateTime.UtcNow,
-                    UpdatedDate = DateTime.UtcNow,
-                    Status = true
-                };
-
-                string password = GeneratePassword();
-                var result = await _userManager.CreateAsync(user, password);
-
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-
-                    GenerateAlertMessage(false, "The member is failed to create");
-
-                    return View(viewModel);
+                    await _userManager.RemoveFromRoleAsync(member.User, oldRole.Name);
+                    await _userManager.AddToRoleAsync(member.User, newRole.Name);
                 }
 
-                var role = await _roleManager.FindByIdAsync(viewModel.Role);
+                member.FullName = viewModel.FullName;
+                member.ServiceStatus = viewModel.ServiceStatus;
+                member.PermanentContactNumber = viewModel.PermanentContactNumber;
+                member.Address = viewModel.Address;
+                member.Job = viewModel.Job;
+                member.CadetNumber = viewModel.CadetNumber;
+                member.CadetBattalion = viewModel.CadetBattalion;
+                member.Rank = viewModel.Rank;
+                member.BCNumber = viewModel.BCNumber;
+                member.Battalion = viewModel.Battalion;
+                member.Division = viewModel.Division;
+                member.ActionDate = viewModel.ActionDate;
+                member.ActionReason = viewModel.ActionReason;
+                member.BeneficiaryAddress = viewModel.BeneficiaryAddress;
+                member.BeneficiaryPhoneNumber = viewModel.BeneficiaryPhoneNumber;
 
-                if (role != null)
-                {
-                    await _userManager.AddToRoleAsync(user, role.Name);
-                }
-
-                var member = new Member
-                {
-                    ApplicationUserId = user.Id,
-                    FullName = viewModel.FullName,
-                    ServiceStatus = viewModel.ServiceStatus,
-                    PermanentContactNumber = viewModel.PermanentContactNumber,
-                    Address = viewModel.Address,
-                    Job = viewModel.Job,
-                    CadetNumber = viewModel.CadetNumber,
-                    CadetBattalion = viewModel.CadetBattalion,
-                    Rank = viewModel.Rank,
-                    BCNumber = viewModel.BCNumber,
-                    Battalion = viewModel.Battalion,
-                    Division = viewModel.Division,
-                    ActionDate = viewModel.ActionDate,
-                    ActionReason = viewModel.ActionReason,
-                    BeneficiaryAddress = viewModel.BeneficiaryAddress,
-                    BeneficiaryPhoneNumber = viewModel.BeneficiaryPhoneNumber,
-                };
-
-                await _memberRepository.AddAsync(member);
+                await _memberRepository.UpdateAsync(member);
                 await _memberRepository.CommitAsync();
 
                 // await _smsService.SendSMSAsync(user.PhoneNumber, $"Your password for member app is {password}.");
@@ -275,6 +278,12 @@ namespace MemberApp.Web.Controllers
         {
             Member member = await _memberRepository.GetSingleAsync(x => x.Id == id, x => x.User);
 
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
             var viewModel = new MemberManagementViewModel
             {
                 Id = member.Id,
@@ -294,7 +303,11 @@ namespace MemberApp.Web.Controllers
                 ActionDate = member.ActionDate,
                 ActionReason = member.ActionReason,
                 BeneficiaryAddress = member.BeneficiaryAddress,
-                BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber
+                BeneficiaryPhoneNumber = member.BeneficiaryPhoneNumber,
+                IsLocked = member.User.IsLocked,
+                IsConfirmedByAdmin = member.User.IsConfirmedByAdmin,
+                PermissionStatus = member.PermissionStatus,
+                PermissionDate = member.PermissionDate,
             };
 
             return View(viewModel);
@@ -305,7 +318,7 @@ namespace MemberApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Confirm(MemberIdViewModel viewModel)
         {
-            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
             if (member == null)
             {
@@ -314,6 +327,28 @@ namespace MemberApp.Web.Controllers
             }
 
             member.User.IsConfirmedByAdmin = true;
+            member.User.UpdatedDate = DateTime.UtcNow;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Unconfirm(MemberIdViewModel viewModel)
+        {
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.User.IsConfirmedByAdmin = false;
+            member.User.UpdatedDate = DateTime.UtcNow;
 
             await _memberRepository.UpdateAsync(member);
             await _memberRepository.CommitAsync();
@@ -325,7 +360,7 @@ namespace MemberApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Lock(MemberIdViewModel viewModel)
         {
-            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
             if (member == null)
             {
@@ -334,6 +369,7 @@ namespace MemberApp.Web.Controllers
             }
 
             member.User.IsLocked = true;
+            member.User.UpdatedDate = DateTime.UtcNow;
 
             await _memberRepository.UpdateAsync(member);
             await _memberRepository.CommitAsync();
@@ -346,7 +382,7 @@ namespace MemberApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Unlock(MemberIdViewModel viewModel)
         {
-            var member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
 
             if (member == null)
             {
@@ -355,6 +391,51 @@ namespace MemberApp.Web.Controllers
             }
 
             member.User.IsLocked = false;
+            member.User.UpdatedDate = DateTime.UtcNow;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            GenerateAlertMessage(true, "Member unlocked");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ApprovePermissionToEdit(MemberIdViewModel viewModel)
+        {
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.PermissionStatus = PermissionStatus.Approved;
+            member.PermissionDate = DateTime.UtcNow;
+
+            await _memberRepository.UpdateAsync(member);
+            await _memberRepository.CommitAsync();
+
+            GenerateAlertMessage(true, "Member locked");
+            return RedirectToAction(nameof(Manage), new { id = viewModel.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RejectPermissionToEdit(MemberIdViewModel viewModel)
+        {
+            Member member = await _memberRepository.GetSingleAsync(x => x.Status && x.Id == viewModel.Id, x => x.User);
+
+            if (member == null)
+            {
+                GenerateAlertMessage(false, "Member not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            member.PermissionStatus = PermissionStatus.Rejected;
+            member.PermissionDate = DateTime.UtcNow;
 
             await _memberRepository.UpdateAsync(member);
             await _memberRepository.CommitAsync();

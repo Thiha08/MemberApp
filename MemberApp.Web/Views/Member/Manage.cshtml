@@ -9,6 +9,9 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4">
+            <a class="btn btn-info btn-round btn-fab member-edit-button" asp-action="Edit" asp-route-id="@Model.Id">
+                <i class="material-icons">edit_note</i>
+            </a>
             <div class="card card-profile card-member">
                 <div class="card-avatar">
                     <a href="#pablo">
@@ -17,7 +20,7 @@
                 </div>
                 <div class="card-body">
                     <h4 class="card-title">@Model.FullName</h4>
-                    <h6 class="card-category text-gray">@Model.Rank</h6>
+                    <h6 class="card-category">@Model.Rank</h6>
                     <table class="contact-info-table table table-no-bordered dtr-inline" cellspacing="0" width="100%" style="width: 100%;" role="grid">
                         <tbody>
                             <tr role="row">
@@ -34,7 +37,108 @@
                             </tr>
                             <tr role="row">
                                 <td>@Localizer["PermantContactNumber"]</td>
-                                <td>@Model.PermanentContactNumber</td>
+                                <td>
+                                    @Model.PermanentContactNumber
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["PermissionToEdit"]</td>
+                                <td>
+                                    @if (Model.PermissionStatus == PermissionStatus.Default)
+                                    {
+                                        <span>NOT FOUND</span>
+
+                                        <button type="button" class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                    else if(Model.PermissionStatus == PermissionStatus.Pending)
+                                    {
+                                        <span>REQUESTED AT @Model.PermissionDate</span>
+
+                                        <button type="button" class="btn btn-success btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#allowToEditModal">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-danger btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#rejectToEditModal">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                    else if(Model.PermissionStatus == PermissionStatus.Approved)
+                                    {
+                                         <span>ALLOWED AT @Model.PermissionDate</span>
+
+                                         <button type="button" class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                    else if(Model.PermissionStatus == PermissionStatus.Rejected)
+                                    {
+                                         <span>REJECTED AT @Model.PermissionDate</span>
+
+                                         <button type="button" class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["PermissionToJoin"]</td>
+                                <td>
+                                    @if (Model.IsConfirmedByAdmin)
+                                    {
+                                        @:CONFIRMED
+                                        <button type="button" class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-danger btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#unconfirmMemberModal">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        @:UNCONFIRMED
+                                        <button type="button" class="btn btn-success btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#confirmMemberModal">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                            <tr role="row">
+                                <td>@Localizer["Lock Status"]</td>
+                                <td>
+                                    @if (Model.IsLocked)
+                                    {
+                                        @:LOCKED
+                                        <button type="button" class="btn btn-success btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#unlockMemberModal">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        @:UNLOCKED
+                                         <button type="button" class="btn btn-round btn-fab btn-icon-small pull-right member-button">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button class="btn btn-danger btn-round btn-fab btn-icon-small pull-right member-button" data-toggle="modal" data-target="#lockMemberModal">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    }
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -47,7 +151,7 @@
                     <div class="card-icon">
                         <i class="material-icons">perm_identity</i>
                     </div>
-                    <h4 class="card-title"> @Localizer["PersonalInformation"]</h4>>
+                    <h4 class="card-title"> @Localizer["PersonalInformation"]</h4>
                 </div>
                 <div class="card-body ">
                     <table class="personal-info-table table table-no-bordered dtr-inline" cellspacing="0" width="100%" style="width: 100%;" role="grid">
@@ -71,6 +175,10 @@
                             <tr role="row">
                                 <td>@Localizer["LastBattalion"]</td>
                                 <td>@Model.Battalion</td>
+                            </tr>
+                             <tr role="row">
+                                <td>@Localizer["Division"]</td>
+                                <td>@Model.Division</td>
                             </tr>
                             <tr role="row">
                                 <td>@Localizer["CurrentJob"]</td>
@@ -162,34 +270,6 @@
                             }
                         </tbody>
                     </table>
-                    @* <div class="row">
-                        <div class="col-md-12">
-                        @if(Model.IsConfirmedByAdmin)
-                        {
-                        if(Model.IsLocked)
-                        {
-                        <button type="button" class="btn btn-fill btn-success pull-right" data-toggle="modal" data-target="#unlockMemberModal">
-                        Unlock
-                        <i class="material-icons">lock_open</i>
-                        </button>
-                        }
-                        else
-                        {
-                        <button type="button" class="btn btn-fill btn-danger pull-right" data-toggle="modal" data-target="#lockMemberModal">
-                        Lock
-                        <i class="material-icons">lock</i>
-                        </button>
-                        }
-                        }
-                        else
-                        {
-                        <button type="button" class="btn btn-fill btn-success pull-right" data-toggle="modal" data-target="#confirmMemberModal">
-                        Confirm
-                        <i class="material-icons">verified_user</i>
-                        </button>
-                        }
-                        </div>
-                        </div>*@
                 </div>
             </div>
 
@@ -206,7 +286,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <h5 class="modal-title" id="confirmMemberModalLabel">CONFIRMATION</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -215,8 +295,31 @@
                     <p class="modal-message">Are you sure you want confirm this member?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button type="submit" class="btn btn-success">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="unconfirmMemberModal" tabindex="-1" role="dialog" aria-labelledby="unconfirmMemberModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="Unconfirm" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="unconfirmMemberModalLabel">CONFIRMATION</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want unconfirm this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
                 </div>
             </div>
         </div>
@@ -229,7 +332,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">CONFIRMATION</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -238,8 +341,8 @@
                     <p class="modal-message">Are you sure you want to lock this member?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button type="submit" class="btn btn-danger">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
                 </div>
             </div>
         </div>
@@ -252,7 +355,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationDeleteModalLabel">Confirmation</h5>
+                    <h5 class="modal-title" id="confirmationDeleteModalLabel">CONFIRMATION</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -261,8 +364,54 @@
                     <p class="modal-message">Are you sure you want to unlock this member?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button type="submit" class="btn btn-success">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="rejectToEditModal" tabindex="-1" role="dialog" aria-labelledby="rejectToEditModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="RejectPermissionToEdit" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectToEditModalLabel">CONFIRMATION</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to reject permission to request of this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="allowToEditModal" tabindex="-1" role="dialog" aria-labelledby="allowToEditModalLabel" aria-hidden="true">
+    <form asp-controller="Member" asp-action="ApprovePermissionToEdit" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="allowToEditModalLabel">CONFIRMATION</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-message">Are you sure you want to allow permission to request of this member?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">NO</button>
+                    <button type="submit" class="btn btn-success">YES</button>
                 </div>
             </div>
         </div>

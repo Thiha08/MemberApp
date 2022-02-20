@@ -96,7 +96,7 @@
                                                             @Html.DisplayFor(modelItem => item.FullName)
                                                         </td>
                                                         <td>
-                                                            @Html.DisplayFor(modelItem => item.CurrentStatus)
+                                                            @Localizer[item.CurrentStatus.ToDescription()]
                                                         </td>
                                                         <td>
                                                             @Html.DisplayFor(modelItem => item.Division)

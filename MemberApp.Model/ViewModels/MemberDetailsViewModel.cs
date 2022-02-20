@@ -3,7 +3,7 @@ using System;
 
 namespace MemberApp.Model.ViewModels
 {
-    public class MemberManagementViewModel
+    public class MemberDetailsViewModel
     {
         public long Id { get; set; }
         public string FullName { get; set; }
@@ -23,9 +23,5 @@ namespace MemberApp.Model.ViewModels
         public string BeneficiaryPhoneNumber { get; set; }
         public DateTime? ActionDate { get; set; }
         public string ActionReason { get; set; }
-        public bool IsLocked { get; set; }
-        public bool IsConfirmedByAdmin { get; set; }
-        public PermissionStatus PermissionStatus { get; set; }
-        public DateTime? PermissionDate { get; set; }
     }
 }

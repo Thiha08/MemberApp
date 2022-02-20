@@ -171,8 +171,17 @@
   <data name="LastBattalion" xml:space="preserve">
     <value>နောက်ဆုံးတာဝန်ထမ်းဆောင်ခဲ့သောတပ်</value>
   </data>
+  <data name="NotFound" xml:space="preserve">
+    <value />
+  </data>
   <data name="PermantContactNumber" xml:space="preserve">
     <value>အမြဲတမ်း ဆက်သွယ်နိုင်သည့် နံပါတ်</value>
+  </data>
+  <data name="PermissionToEdit" xml:space="preserve">
+    <value>ပြုပြင်ရန် တောင်းဆိုမှု</value>
+  </data>
+  <data name="PermissionToJoin" xml:space="preserve">
+    <value>အဖွင့်ဝင်ရန် တောင်းဆိုမှု</value>
   </data>
   <data name="PersonalInformation" xml:space="preserve">
     <value>ကိုယ်ရေးအချက်အလက်</value>

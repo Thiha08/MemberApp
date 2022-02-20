@@ -101,6 +101,9 @@ namespace MemberApp.Web.ApiControllers
                 if (!user.IsConfirmedByAdmin)
                     throw new Exception("Please contact admin to confirm your account");
 
+                if (user.IsLocked)
+                    throw new Exception("Please contact admin to unlock your account");
+
                 bool isValidOTP = CheckLoginOTPCode(user, request.OTPCode);
 
                 if (!isValidOTP)

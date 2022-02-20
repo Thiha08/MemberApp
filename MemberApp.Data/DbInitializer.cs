@@ -52,6 +52,7 @@ namespace MemberApp.Data
             {
                 var user = new ApplicationUser();
                 user.UserName = "SuperAdmin";
+                user.IsConfirmedByAdmin = true;
                 IdentityResult userResult = userManager.CreateAsync(user, "welcome123").Result;
 
                 var adminUser = userManager.FindByNameAsync(user.UserName).Result;

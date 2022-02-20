@@ -1,7 +1,8 @@
 ﻿namespace MemberApp.Model.Constants
 {
-    public enum ProtectionStatus
+    public enum PermissionStatus
     {
+        Default,
         Pending,
         Approved,
         Rejected
