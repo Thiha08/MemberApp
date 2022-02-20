@@ -71,6 +71,15 @@ namespace MemberApp.Data.Infrastructure.Core.Result
             };
         }
 
+        public static Result<T> BadRequest(T data, string message = null)
+        {
+            return new Result<T>(data)
+            {
+                Status = ResultStatus.BadRequest,
+                Message = message ?? ResultStatus.BadRequest.ToDescription()
+            };
+        }
+
         public static new Result<T> BadRequest(string message = null)
         {
             return new Result<T>(ResultStatus.BadRequest) { Message = message ?? ResultStatus.BadRequest.ToDescription() };

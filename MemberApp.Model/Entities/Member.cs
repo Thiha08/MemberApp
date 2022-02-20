@@ -23,6 +23,7 @@ namespace MemberApp.Model.Entities
         public string BeneficiaryPhoneNumber { get; set; }
         public PermissionStatus PermissionStatus { get; set; }
         public DateTime? PermissionDate { get; set; }
+        public string EditOTP { get; set; }
         public ApplicationUser User { get; set; }
     }
 }

@@ -53,7 +53,7 @@ namespace MemberApp.Web.ApiControllers
                 {
                     UserName = request.PhoneNumber,
                     PhoneNumber = request.PhoneNumber,
-                    PhoneNumberConfirmed = false,
+                    Email = request.Email,
                     CreatedDate = DateTime.UtcNow,
                     UpdatedDate = DateTime.UtcNow,
                     IsConfirmedByAdmin = false,
@@ -71,6 +71,21 @@ namespace MemberApp.Web.ApiControllers
                 var member = new Member
                 {
                     ApplicationUserId = user.Id,
+                    FullName = request.FullName,
+                    ServiceStatus = request.ServiceStatus,
+                    PermanentContactNumber = request.PermanentContactNumber,
+                    Address = request.Address,
+                    Job = request.Job,
+                    CadetNumber = request.CadetNumber,
+                    CadetBattalion = request.CadetBattalion,
+                    Rank = request.Rank,
+                    BCNumber = request.BCNumber,
+                    Battalion = request.Battalion,
+                    Division = request.Division,
+                    ActionDate = request.ActionDate?.ToUniversalTime(),
+                    ActionReason = request.ActionReason,
+                    BeneficiaryAddress = request.BeneficiaryAddress,
+                    BeneficiaryPhoneNumber = request.BeneficiaryPhoneNumber,
                 };
 
                 await _memberRepository.AddAsync(member);
@@ -91,6 +106,8 @@ namespace MemberApp.Web.ApiControllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginWithOTP([FromBody] LoginData request)
         {
+            var loginResult = new LoginResult();
+
             try
             {
                 var user = await _userManager.FindByNameAsync(request.PhoneNumber);
@@ -99,15 +116,28 @@ namespace MemberApp.Web.ApiControllers
                     throw new Exception("Phone number or password is wrong");
 
                 if (!user.IsConfirmedByAdmin)
+                {
                     throw new Exception("Please contact admin to confirm your account");
+                }
+
+                loginResult.IsNotConfirmedByAdmin = false;
 
                 if (user.IsLocked)
+                {   
                     throw new Exception("Please contact admin to unlock your account");
+                }
+
+                loginResult.IsLocked = false;
+
 
                 bool isValidOTP = CheckLoginOTPCode(user, request.OTPCode);
 
                 if (!isValidOTP)
+                {
                     throw new Exception("Invalid OTP");
+                }
+
+                loginResult.IsNotValidOTP = false;
 
                 var roles = await _userManager.GetRolesAsync(user);
 
@@ -123,16 +153,15 @@ namespace MemberApp.Web.ApiControllers
                 user.OTPCodeExpiryDate = DateTime.UtcNow; // release OTP code
                 await _userManager.UpdateAsync(user);
 
-                var result = Result<LoginResult>.Ok(new LoginResult
-                {
-                    AccessToken = generatedToken
-                }, "Authentication succeeded");
+                loginResult.AccessToken = generatedToken;
+
+                var result = Result<LoginResult>.Ok(loginResult, "Authentication succeeded");
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                var result = Result.BadRequest(ex.Message);
+                var result = Result<LoginResult>.BadRequest(loginResult, ex.Message);
                 return Ok(result);
             }
         }
