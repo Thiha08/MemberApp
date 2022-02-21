@@ -23,6 +23,6 @@ namespace MemberApp.Model.ViewModels
         public string BeneficiaryPhoneNumber { get; set; }
         public DateTime? ActionDate { get; set; }
         public string ActionReason { get; set; }
-        public string EditOTP { get; set; }
+        public bool? EditConfirmed { get; set; }
     }
 }

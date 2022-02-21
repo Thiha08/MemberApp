@@ -166,8 +166,8 @@ namespace MemberApp.Web.ApiControllers
             }
         }
 
-        [HttpPost("sendOTP")]
-        public async Task<IActionResult> SendOTP([FromBody] OTPCodeRequest request)
+        [HttpPost("loginOTPRequest")]
+        public async Task<IActionResult> LoginOTPRequest([FromBody] OTPCodeRequest request)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace MemberApp.Web.ApiControllers
                 user.OTPCodeExpiryDate = DateTime.UtcNow.AddSeconds(Constants.OTPCodeExpirySeconds);
 
                 await _userManager.UpdateAsync(user);
-                await _smsService.SendSMSAsync(user.PhoneNumber, $"MemberApp: Your OTP code is : {user.OTPCode}");
+                await _smsService.SendSMSAsync(user.PhoneNumber, $"MemberApp: Your OTP code is : {user.OTPCode}, will be expired in 10 min.");
 
                 var result = Result.Ok($"OTP code sent to {user.PhoneNumber}");
                 return Ok(result);

@@ -23,14 +23,16 @@
     <!-- Material Dashboard CSS -->
     <link href="~/lib/material-dashboard/assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
 
-    <environment names="Development">
+    <link rel="stylesheet" href="~/css/site.css" />
+
+   @* <environment names="Development">
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    </environment>
+    </environment>*@
 </head>
-<body>
+<body class="sidebar-mini">
     <div class="wrapper ">
         @await Html.PartialAsync("_Sidebar")
         <div class="main-panel">
@@ -112,12 +114,14 @@
     <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="~/lib/material-dashboard/assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
 
-    <environment names="Development">
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @*<environment names="Development">
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
     <environment names="Staging,Production">
         <script src="~/js/site.min.js" asp-append-version="true"></script>
-    </environment>
+    </environment>*@
 
     <script>
         $(document).ready(function () {

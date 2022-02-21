@@ -414,8 +414,7 @@ namespace MemberApp.Web.Controllers
 
             member.PermissionStatus = PermissionStatus.Approved;
             member.PermissionDate = DateTime.UtcNow;
-            member.EditOTP = Constants.GenerateOTPCode;
-
+            
             await _memberRepository.UpdateAsync(member);
             await _memberRepository.CommitAsync();
 

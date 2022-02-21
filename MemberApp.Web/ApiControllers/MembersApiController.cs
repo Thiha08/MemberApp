@@ -1,5 +1,6 @@
 ﻿using MemberApp.Data.Abstract;
 using MemberApp.Data.Infrastructure.Core.Result;
+using MemberApp.Data.Infrastructure.Services.Abstract;
 using MemberApp.Model.Constants;
 using MemberApp.Model.Entities;
 using MemberApp.Model.RequestModels;
@@ -25,11 +26,13 @@ namespace MemberApp.Web.ApiControllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Member> _memberRepository;
+        private readonly ISmsService _smsService;
 
-        public MembersApiController(UserManager<ApplicationUser> userManager, IRepository<Member> memberRepository)
+        public MembersApiController(UserManager<ApplicationUser> userManager, IRepository<Member> memberRepository, ISmsService smsService)
         {
             _userManager = userManager;
             _memberRepository = memberRepository;
+            _smsService = smsService;
         }
 
         [HttpGet]
@@ -146,7 +149,11 @@ namespace MemberApp.Web.ApiControllers
 
                 if (member.PermissionStatus == PermissionStatus.Approved && member.PermissionDate.Value.AddDays(1) >= DateTime.UtcNow)
                 {
-                    viewModel.EditOTP = member.EditOTP;
+                    viewModel.EditConfirmed = true;
+                }
+                else if(member.PermissionStatus == PermissionStatus.Pending)
+                {
+                    viewModel.EditConfirmed = false;
                 }
 
                 var result = Result<MemberProfileViewModel>.Ok(viewModel);
@@ -159,7 +166,7 @@ namespace MemberApp.Web.ApiControllers
             }
         }
 
-        [HttpPost("update")]
+        [HttpPost("verifyOTPEdit")]
         public async Task<IActionResult> Update([FromBody] MemberUpdateData data)
         {
             try
@@ -188,6 +195,9 @@ namespace MemberApp.Web.ApiControllers
                 if (member.EditOTP != data.EditOTP)
                     throw new Exception("Invalid edit OTP");
 
+                if(member.EditOTPCodeExpiryDate < DateTime.UtcNow)
+                    throw new Exception("Expired edit OTP");
+
                 member.User.UserName = data.PhoneNumber;
                 member.User.PhoneNumber = data.PhoneNumber;
                 member.User.Email = data.Email;
@@ -210,7 +220,7 @@ namespace MemberApp.Web.ApiControllers
 
                 member.PermissionStatus = PermissionStatus.Default;
                 member.PermissionDate = DateTime.UtcNow;
-                member.EditOTP = null;
+                member.EditOTPCodeExpiryDate = DateTime.UtcNow; // release OTP
 
                 await _memberRepository.UpdateAsync(member);
                 await _memberRepository.CommitAsync();
@@ -227,8 +237,8 @@ namespace MemberApp.Web.ApiControllers
             }
         }
 
-        [HttpPost("requestToEdit")]
-        public async Task<IActionResult>RequestToEdit()
+        [HttpPost("editRequest")]
+        public async Task<IActionResult> EditRequest()
         {
             try
             {
@@ -258,6 +268,48 @@ namespace MemberApp.Web.ApiControllers
                 var result = Result.BadRequest(ex.Message);
                 return Ok(result);
             }
+        }
+
+        [HttpPost("editOTPRequest")]
+        public async Task<IActionResult> EditOTPRequest()
+        {
+            try
+            {
+                var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+
+                var exists = await _userManager.FindByNameAsync(userName);
+
+                if (exists == null)
+                    throw new Exception("Please login again");
+
+                Member member = await _memberRepository.GetSingleAsync(x => x.ApplicationUserId == exists.Id, x => x.User);
+
+                if (member.PermissionStatus == PermissionStatus.Pending)
+                    throw new Exception("Edit request approval is still pending");
+
+                if (member.PermissionStatus == PermissionStatus.Rejected)
+                    throw new Exception("Edit request approval is rejected");
+
+                if (member.PermissionStatus != PermissionStatus.Approved || member.PermissionDate.Value.AddDays(1) < DateTime.UtcNow)
+                    throw new Exception("Edit request approval is expired");
+
+                member.EditOTP = Constants.GenerateOTPCode;
+                member.EditOTPCodeExpiryDate = DateTime.UtcNow.AddSeconds(Constants.OTPCodeExpirySeconds); 
+               
+                await _memberRepository.UpdateAsync(member);
+                await _memberRepository.CommitAsync();
+
+                await _smsService.SendSMSAsync(member.User.PhoneNumber, $"MemberApp: Your edit OTP code is : {member.EditOTP}, will be expired in 10 min.");
+
+                var result = Result.Ok($"Edit OTP code sent to {member.User.PhoneNumber}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var result = Result.BadRequest(ex.Message);
+                return Ok(result);
+            }
+
         }
     }
 }

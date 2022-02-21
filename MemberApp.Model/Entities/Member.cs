@@ -24,6 +24,7 @@ namespace MemberApp.Model.Entities
         public PermissionStatus PermissionStatus { get; set; }
         public DateTime? PermissionDate { get; set; }
         public string EditOTP { get; set; }
+        public DateTime? EditOTPCodeExpiryDate { get; set; }
         public ApplicationUser User { get; set; }
     }
 }
