@@ -2,7 +2,7 @@
 {
     public class PagedInfo
     {
-        public PagedInfo(long pageNumber, long pageSize, long totalPages, long totalRecords)
+        public PagedInfo(int pageNumber, int pageSize, int totalPages, int totalRecords)
         {
             PageNumber = pageNumber;
             PageSize = pageSize;
@@ -10,33 +10,33 @@
             TotalRecords = totalRecords;
         }
 
-        public long PageNumber { get; private set; }
-        public long PageSize { get; private set; }
-        public long TotalPages { get; private set; }
-        public long TotalRecords { get; private set; }
+        public int PageNumber { get; private set; }
+        public int PageSize { get; private set; }
+        public int TotalPages { get; private set; }
+        public int TotalRecords { get; private set; }
 
-        public PagedInfo SetPageNumber(long pageNumber)
+        public PagedInfo SetPageNumber(int pageNumber)
         {
             PageNumber = pageNumber;
 
             return this;
         }
 
-        public PagedInfo SetPageSize(long pageSize)
+        public PagedInfo SetPageSize(int pageSize)
         {
             PageSize = pageSize;
 
             return this;
         }
 
-        public PagedInfo SetTotalPages(long totalPages)
+        public PagedInfo SetTotalPages(int totalPages)
         {
             TotalPages = totalPages;
 
             return this;
         }
 
-        public PagedInfo SetTotalRecords(long totalRecords)
+        public PagedInfo SetTotalRecords(int totalRecords)
         {
             TotalRecords = totalRecords;
 

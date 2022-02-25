@@ -36,7 +36,7 @@ namespace MemberApp.Web.ApiControllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] string keywords)
+        public async Task<IActionResult> Get([FromQuery] string keywords, int pageNumber = 1, int pageSize = 10)
         {
             try
             {
@@ -46,7 +46,9 @@ namespace MemberApp.Web.ApiControllers
                 if (!string.IsNullOrWhiteSpace(keywords))
                     query = query.Where(x => x.FullName.Contains(keywords));
 
-                var membersVM = await query.Select(
+                var members = await PaginatedList<Member>.CreateAsync(query.AsNoTracking(), pageNumber, pageSize);
+
+                var membersVM = members.Select(
                     x => new MemberOverviewResult
                     {
                         Id = x.Id,
@@ -54,10 +56,16 @@ namespace MemberApp.Web.ApiControllers
                         ServiceStatus = x.ServiceStatus
                     })
                     .OrderBy(x => x.FullName)
-                    .ToListAsync();
+                    .ToList();
 
                 var result = Result<List<MemberOverviewResult>>.Ok(membersVM);
-                return Ok(result);
+
+                return Ok(result.ToPagedResult(
+                    new PagedInfo(
+                        members.PageIndex,
+                        members.PageSize,
+                        members.TotalPages,
+                        members.TotalRecords)));
             }
             catch (Exception ex)
             {
@@ -151,7 +159,7 @@ namespace MemberApp.Web.ApiControllers
                 {
                     viewModel.EditConfirmed = true;
                 }
-                else if(member.PermissionStatus == PermissionStatus.Pending)
+                else if (member.PermissionStatus == PermissionStatus.Pending)
                 {
                     viewModel.EditConfirmed = false;
                 }
@@ -195,7 +203,7 @@ namespace MemberApp.Web.ApiControllers
                 if (member.EditOTP != data.EditOTP)
                     throw new Exception("Invalid edit OTP");
 
-                if(member.EditOTPCodeExpiryDate < DateTime.UtcNow)
+                if (member.EditOTPCodeExpiryDate < DateTime.UtcNow)
                     throw new Exception("Expired edit OTP");
 
                 member.User.UserName = data.PhoneNumber;
@@ -294,8 +302,8 @@ namespace MemberApp.Web.ApiControllers
                     throw new Exception("Edit request approval is expired");
 
                 member.EditOTP = Constants.GenerateOTPCode;
-                member.EditOTPCodeExpiryDate = DateTime.UtcNow.AddSeconds(Constants.OTPCodeExpirySeconds); 
-               
+                member.EditOTPCodeExpiryDate = DateTime.UtcNow.AddSeconds(Constants.OTPCodeExpirySeconds);
+
                 await _memberRepository.UpdateAsync(member);
                 await _memberRepository.CommitAsync();
 
